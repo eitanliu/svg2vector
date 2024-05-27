@@ -19,9 +19,9 @@ package com.android.ide.common.vectordrawable;
 
 import com.android.ide.common.util.AssetUtil;
 import com.google.common.base.Charsets;
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
+import org.apache.xml.serialize.OutputFormat;
+import org.apache.xml.serialize.XMLSerializer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.w3c.dom.Document;
