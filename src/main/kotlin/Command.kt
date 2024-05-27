@@ -55,7 +55,7 @@ object Command {
             }
             if (file != null) {
 
-                output = file.substringBeforeLast(".") + ".xml"
+                output = file.substringBeforeLast(".").fixFileName() + ".xml"
             }
         }
 
@@ -92,7 +92,7 @@ object Command {
             for (childFile in childFiles) {
                 if (childFile.isFile && childFile.length() > 0) {
                     svg2vectorForFile(
-                        childFile, File(outputDir, childFile.nameWithoutExtension + ".xml"),
+                        childFile, File(outputDir, childFile.fixFileName() + ".xml"),
                     )
                 }
             }
@@ -102,7 +102,7 @@ object Command {
     private fun svg2vectorForFile(inputFile: File, outputFile: File) {
         if (inputFile.name.endsWith(".svgz")) {
             val tempUnzipFile =
-                File(inputFile.parent, inputFile.nameWithoutExtension + ".svg")
+                File(inputFile.parent, inputFile.fixFileName() + ".svg")
             try {
                 unZipGzipFile(inputFile, tempUnzipFile)
                 svg2vectorForFile(tempUnzipFile, outputFile)
@@ -112,14 +112,15 @@ object Command {
                 tempUnzipFile.delete()
             }
         } else if (inputFile.name.endsWith(".svg")) {
+            println("${inputFile.name} → ${outputFile.name}")
             outputFile.outputStream().use { out ->
 
-                Svg2Vector.parseSvgToXml(inputFile, out)
+                Svg2Vector.parseSvgToXml(inputFile.toPath(), out)
             }
         }
     }
 
-    fun unZipGzipFile(source: File, destination: File) {
+    private fun unZipGzipFile(source: File, destination: File) {
         if (destination.parentFile.exists() || destination.parentFile.mkdirs()) {
             source.inputStream().use { fis ->
                 GZIPInputStream(fis).use { gis ->
@@ -134,5 +135,12 @@ object Command {
                 }
             }
         }
+    }
+
+    private fun File.fixFileName() = nameWithoutExtension.fixFileName()
+
+    private fun String.fixFileName(replacement: String = "_"): String {
+        val regex = Regex("[^a-zA-Z0-9]+")
+        return replace(regex, replacement)
     }
 }

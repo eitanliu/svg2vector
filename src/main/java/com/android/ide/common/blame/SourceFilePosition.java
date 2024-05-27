@@ -16,51 +16,51 @@
 
 package com.android.ide.common.blame;
 
+import com.android.annotations.NonNull;
 import com.google.common.base.Objects;
-
-import org.jetbrains.annotations.NotNull;
-
 import java.io.File;
+import java.io.Serializable;
 
-public final class SourceFilePosition {
+
+public final class SourceFilePosition implements Serializable {
 
     public static final SourceFilePosition UNKNOWN =
             new SourceFilePosition(SourceFile.UNKNOWN, SourcePosition.UNKNOWN);
 
-    @NotNull
+    @NonNull
     private final SourceFile mSourceFile;
 
-    @NotNull
+    @NonNull
     private final SourcePosition mSourcePosition;
 
-    public SourceFilePosition(@NotNull SourceFile sourceFile,
-            @NotNull SourcePosition sourcePosition) {
+    public SourceFilePosition(@NonNull SourceFile sourceFile,
+            @NonNull SourcePosition sourcePosition) {
         mSourceFile = sourceFile;
         mSourcePosition = sourcePosition;
     }
 
-    public SourceFilePosition(@NotNull File file,
-            @NotNull SourcePosition sourcePosition) {
+    public SourceFilePosition(@NonNull File file,
+            @NonNull SourcePosition sourcePosition) {
         this(new SourceFile(file), sourcePosition);
     }
 
-    @NotNull
+    @NonNull
     public SourcePosition getPosition() {
         return mSourcePosition;
     }
 
-    @NotNull
+    @NonNull
     public SourceFile getFile() {
         return mSourceFile;
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String toString() {
         return print(false);
     }
 
-    @NotNull
+    @NonNull
     public String print(boolean shortFormat) {
         if (mSourcePosition.equals(SourcePosition.UNKNOWN)) {
             return mSourceFile.print(shortFormat);

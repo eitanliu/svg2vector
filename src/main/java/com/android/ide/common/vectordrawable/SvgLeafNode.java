@@ -13,113 +13,174 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.android.ide.common.vectordrawable;
 
-import com.google.common.collect.ImmutableMap;
-import org.w3c.dom.Node;
+import static com.android.ide.common.vectordrawable.Svg2Vector.SVG_FILL;
+import static com.android.ide.common.vectordrawable.Svg2Vector.SVG_FILL_OPACITY;
+import static com.android.ide.common.vectordrawable.Svg2Vector.SVG_OPACITY;
+import static com.android.ide.common.vectordrawable.Svg2Vector.SVG_STROKE;
+import static com.android.ide.common.vectordrawable.Svg2Vector.SVG_STROKE_OPACITY;
+import static com.android.ide.common.vectordrawable.Svg2Vector.SVG_STROKE_WIDTH;
+import static com.android.ide.common.vectordrawable.Svg2Vector.presentationMap;
+import static com.android.utils.XmlUtils.formatFloatValue;
+import static java.lang.Math.abs;
+import static java.lang.Math.sqrt;
 
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+import com.android.ide.common.vectordrawable.PathParser.ParseMode;
+import java.awt.geom.AffineTransform;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.w3c.dom.Element;
 
-/**
- * Represent a SVG file's leave element.
- */
+/** Represents an SVG file's leaf element. */
 class SvgLeafNode extends SvgNode {
-    private static Logger logger = Logger.getLogger(SvgLeafNode.class.getSimpleName());
+    private static final Logger logger = Logger.getLogger(SvgLeafNode.class.getSimpleName());
 
-    private String mPathData;
+    @Nullable private String mPathData;
+    @Nullable private SvgGradientNode mFillGradientNode;
+    @Nullable private SvgGradientNode mStrokeGradientNode;
 
-    // Key is the attributes for vector drawable, and the value is the converted from SVG.
-    private HashMap<String, String> mVdAttributesMap = new HashMap<String, String>();
-
-    public SvgLeafNode(SvgTree svgTree, Node node, String nodeName) {
-        super(svgTree, node, nodeName);
-    }
-
-    private String getAttributeValues(ImmutableMap<String, String> presentationMap) {
-        StringBuilder sb = new StringBuilder("/>\n");
-        for (String key : mVdAttributesMap.keySet()) {
-            String vectorDrawableAttr = presentationMap.get(key);
-            String svgValue = mVdAttributesMap.get(key);
-            String vdValue = svgValue.trim();
-            // There are several cases we need to convert from SVG format to
-            // VectorDrawable format. Like "none", "3px" or "rgb(255, 0, 0)"
-            if ("none".equals(vdValue)) {
-                vdValue = "#00000000";
-            } else if (vdValue.endsWith("px")){
-                vdValue = vdValue.substring(0, vdValue.length() - 2);
-            } else if (vdValue.startsWith("rgb")) {
-                vdValue = vdValue.substring(3, vdValue.length());
-                vdValue = convertRGBToHex(vdValue);
-                if (vdValue == null) {
-                    getTree().logErrorLine("Unsupported Color format " + vdValue, getDocumentNode(),
-                                           SvgTree.SvgLogLevel.ERROR);
-                }
-            }
-            String attr = "\n        " + vectorDrawableAttr + "=\"" +
-                          vdValue + "\"";
-            sb.insert(0, attr);
-
-        }
-        return sb.toString();
-    }
-
-    public static int clamp(int val, int min, int max) {
-        return Math.max(min, Math.min(max, val));
-    }
-
-    /**
-     * SVG allows using rgb(int, int, int) or rgb(float%, float%, float%) to
-     * represent a color, but Android doesn't. Therefore, we need to convert
-     * them into #RRGGBB format.
-     * @param svgValue in either "(int, int, int)" or "(float%, float%, float%)"
-     * @return #RRGGBB in hex format, or null, if an error is found.
-     */
-    private String convertRGBToHex(String svgValue) {
-        // We don't support color keyword yet.
-        // http://www.w3.org/TR/SVG11/types.html#ColorKeywords
-        String result = null;
-        String functionValue = svgValue.trim();
-        functionValue = svgValue.substring(1, functionValue.length() - 1);
-        // After we cut the "(", ")", we can deal with the numbers.
-        String[] numbers = functionValue.split(",");
-        if (numbers.length != 3) {
-            return null;
-        }
-        int[] color = new int[3];
-        for (int i = 0; i < 3; i ++) {
-            String number = numbers[i];
-            number = number.trim();
-            if (number.endsWith("%")) {
-                float value = Float.parseFloat(number.substring(0, number.length() - 1));
-                color[i] = clamp((int)(value * 255.0f / 100.0f), 0, 255);
-            } else {
-                int value = Integer.parseInt(number);
-                color[i] = clamp(value, 0, 255);
-            }
-        }
-        StringBuilder builder = new StringBuilder();
-        builder.append("#");
-        for (int i = 0; i < 3; i ++) {
-            builder.append(String.format("%02X", color[i]));
-        }
-        result = builder.toString();
-        assert result.length() == 7;
-        return result;
+    SvgLeafNode(@NonNull SvgTree svgTree, @NonNull Element element, @Nullable String nodeName) {
+        super(svgTree, element, nodeName);
     }
 
     @Override
-    public void dumpNode(String indent) {
+    @NonNull
+    public SvgLeafNode deepCopy() {
+        SvgLeafNode newNode = new SvgLeafNode(getTree(), mDocumentElement, getName());
+        newNode.copyFrom(this);
+        return newNode;
+    }
+
+    protected void copyFrom(@NonNull SvgLeafNode from) {
+        super.copyFrom(from);
+        mPathData = from.mPathData;
+    }
+
+    /** Writes attributes of this node. */
+    private void writeAttributeValues(@NonNull OutputStreamWriter writer,  @NonNull String indent)
+            throws IOException {
+        // There could be some redundant opacity information in the attributes' map,
+        // like opacity vs fill-opacity / stroke-opacity.
+        parsePathOpacity();
+
+        for (Map.Entry<String, String> entry : mVdAttributesMap.entrySet()) {
+            String name = entry.getKey();
+            String attribute = presentationMap.get(name);
+            if (attribute == null || attribute.isEmpty()) {
+                continue;
+            }
+            String svgValue = entry.getValue().trim();
+            String vdValue = colorSvg2Vd(svgValue, "#000000");
+
+            if (vdValue == null) {
+                if (name.equals(SVG_FILL) || name.equals(SVG_STROKE)) {
+                    SvgGradientNode gradientNode = getGradientNode(svgValue);
+                    if (gradientNode != null) {
+                        gradientNode = gradientNode.deepCopy();
+                        gradientNode.setSvgLeafNode(this);
+                        if (name.equals(SVG_FILL)) {
+                            gradientNode.setGradientUsage(SvgGradientNode.GradientUsage.FILL);
+                            mFillGradientNode = gradientNode;
+                        } else {
+                            gradientNode.setGradientUsage(SvgGradientNode.GradientUsage.STROKE);
+                            mStrokeGradientNode = gradientNode;
+                        }
+                        continue;
+                    }
+                }
+
+                if (svgValue.endsWith("px")) {
+                    vdValue = svgValue.substring(0, svgValue.length() - 2).trim();
+                } else {
+                    vdValue = svgValue;
+                }
+            }
+            writer.write(System.lineSeparator());
+            writer.write(indent);
+            writer.write(CONTINUATION_INDENT);
+            writer.write(attribute);
+            writer.write("=\"");
+            writer.write(vdValue);
+            writer.write("\"");
+        }
+    }
+
+    @Nullable
+    private SvgGradientNode getGradientNode(@NonNull String svgValue) {
+        if (svgValue.startsWith("url(#") && svgValue.endsWith(")")) {
+            String id = svgValue.substring(5, svgValue.length() - 1);
+            SvgNode node = getTree().getSvgNodeFromId(id);
+            if (node instanceof SvgGradientNode) {
+                return (SvgGradientNode) node;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Parses the SVG path's opacity attribute into fill and stroke.
+     */
+    private void parsePathOpacity() {
+        double opacity = getOpacityValueFromMap(SVG_OPACITY);
+        double fillOpacity = getOpacityValueFromMap(SVG_FILL_OPACITY);
+        double strokeOpacity = getOpacityValueFromMap(SVG_STROKE_OPACITY);
+        putOpacityValueToMap(SVG_FILL_OPACITY, fillOpacity * opacity);
+        putOpacityValueToMap(SVG_STROKE_OPACITY, strokeOpacity * opacity);
+        mVdAttributesMap.remove(SVG_OPACITY);
+    }
+
+    /**
+     * A utility function to get the opacity value as a floating point number.
+     *
+     * @param attributeName the name of the opacity attribute
+     * @return the clamped opacity value, or 1 if not found
+     */
+    private double getOpacityValueFromMap(@NonNull String attributeName) {
+        // Default opacity is 1.
+        double result = 1;
+        String opacity = mVdAttributesMap.get(attributeName);
+        if (opacity != null) {
+            try {
+                if (opacity.endsWith("%")) {
+                    result = Double.parseDouble(opacity.substring(0, opacity.length() - 1)) / 100.;
+                } else {
+                    result = Double.parseDouble(opacity);
+                }
+            } catch (NumberFormatException e) {
+                // Ignore here, an invalid value is replaced by the default value 1.
+            }
+        }
+        return Math.min(Math.max(result, 0), 1);
+    }
+
+    private void putOpacityValueToMap(@NonNull String attributeName, double opacity) {
+        String attributeValue = formatFloatValue(opacity);
+        if (attributeValue.equals("1")) {
+            mVdAttributesMap.remove(attributeName);
+        } else {
+            mVdAttributesMap.put(attributeName, attributeValue);
+        }
+    }
+
+    @Override
+    public void dumpNode(@NonNull String indent) {
         logger.log(Level.FINE, indent + (mPathData != null ? mPathData : " null pathData ") +
                                (mName != null ? mName : " null name "));
     }
 
-    public void setPathData(String pathData) {
+    public void setPathData(@NonNull String pathData) {
         mPathData = pathData;
+    }
+
+    @Nullable
+    public String getPathData() {
+        return mPathData;
     }
 
     @Override
@@ -127,49 +188,134 @@ class SvgLeafNode extends SvgNode {
         return false;
     }
 
+    public boolean hasGradient() {
+        return mFillGradientNode != null || mStrokeGradientNode != null;
+    }
+
     @Override
-    public void transform(float a, float b, float c, float d, float e, float f) {
-        if ("none".equals(mVdAttributesMap.get("fill")) || (mPathData == null)) {
+    public void transformIfNeeded(@NonNull AffineTransform rootTransform) {
+        if (mPathData == null || mPathData.isEmpty()) {
             // Nothing to draw and transform, early return.
             return;
         }
-        // TODO: We need to just apply the transformation to group.
-        VdPath.Node[] n = VdParser.parsePath(mPathData);
-        if (!(a == 1 && d == 1 && b == 0 && c == 0 && e == 0 && f == 0)) {
-            VdPath.Node.transform(a, b, c, d, e, f, n);
+        VdPath.Node[] nodes = PathParser.parsePath(mPathData, ParseMode.SVG);
+        mStackedTransform.preConcatenate(rootTransform);
+        boolean needsConvertRelativeMoveAfterClose = VdPath.Node.hasRelMoveAfterClose(nodes);
+        if (!mStackedTransform.isIdentity() || needsConvertRelativeMoveAfterClose) {
+            VdPath.Node.transform(mStackedTransform, nodes);
         }
-        mPathData = VdPath.Node.NodeListToString(n);
+        mPathData = VdPath.Node.nodeListToString(nodes, mSvgTree);
     }
 
     @Override
-    public void writeXML(OutputStreamWriter writer) throws IOException {
-        String fillColor = mVdAttributesMap.get(Svg2Vector.SVG_FILL_COLOR);
-        String strokeColor = mVdAttributesMap.get(Svg2Vector.SVG_STROKE_COLOR);
-        logger.log(Level.FINE, "fill color " + fillColor);
-        boolean emptyFill = fillColor != null && ("none".equals(fillColor) || "#0000000".equals(fillColor));
-        boolean emptyStroke = strokeColor == null || "none".equals(strokeColor);
-        boolean emptyPath = mPathData == null;
-        boolean nothingToDraw = emptyPath || emptyFill && emptyStroke;
-        if (nothingToDraw) {
-            return;
-        }
+    public void flatten(@NonNull AffineTransform transform) {
+        mStackedTransform.setTransform(transform);
+        mStackedTransform.concatenate(mLocalTransform);
 
-        writer.write("    <path\n");
-        if (!mVdAttributesMap.containsKey(Svg2Vector.SVG_FILL_COLOR)) {
-            logger.log(Level.FINE, "ADDING FILL SVG_FILL_COLOR");
-            writer.write("        android:fillColor=\"#FF000000\"\n");
+        if (!"non-scaling-stroke".equals(mVdAttributesMap.get("vector-effect"))
+                && (mStackedTransform.getType() & AffineTransform.TYPE_MASK_SCALE) != 0) {
+            String strokeWidth = mVdAttributesMap.get(SVG_STROKE_WIDTH);
+            if (strokeWidth != null) {
+                try {
+                    // Unlike SVG, vector drawable is not capable of applying transformations
+                    // to stroke outline. To compensate for that we apply scaling transformation
+                    // to the stroke width, which produces accurate results for uniform and
+                    // approximate results for nonuniform scaling transformation.
+                    double width = Double.parseDouble(strokeWidth);
+                    double determinant = mStackedTransform.getDeterminant();
+                    if (determinant != 0) {
+                        width *= sqrt(abs(determinant));
+                        mVdAttributesMap.put(SVG_STROKE_WIDTH, mSvgTree.formatCoordinate(width));
+                    }
+                    if ((mStackedTransform.getType() & AffineTransform.TYPE_GENERAL_SCALE) != 0) {
+                        logWarning("Scaling of the stroke width is approximate");
+                    }
+                } catch (NumberFormatException ignore) {
+                }
+            }
         }
-        writer.write("        android:pathData=\"" + mPathData + "\"");
-        writer.write(getAttributeValues(Svg2Vector.presentationMap));
     }
 
-    public void fillPresentationAttributes(String name, String value) {
-        logger.log(Level.FINE, ">>>> PROP " + name + " = " + value);
-        if (value.startsWith("url("))  {
-            getTree().logErrorLine("Unsupported URL value: " + value, getDocumentNode(),
-                                   SvgTree.SvgLogLevel.ERROR);
-            return;
+    @Override
+    public void writeXml(@NonNull OutputStreamWriter writer, @NonNull String indent)
+            throws IOException {
+        if (mPathData == null || mPathData.isEmpty()) {
+            return; // No path to draw.
         }
-        mVdAttributesMap.put(name, value);
+
+        if (mStrokeBeforeFill) {
+            // To render fill on top of stroke output the <path> element twice,
+            // first without fill, and then without stroke.
+            writePathElementWithSuppressedFillOrStroke(writer, SVG_FILL, indent);
+            writePathElementWithSuppressedFillOrStroke(writer, SVG_STROKE, indent);
+        } else {
+            writePathElement(writer, indent);
+        }
+    }
+
+    private void writePathElementWithSuppressedFillOrStroke(
+            @NonNull OutputStreamWriter writer, @NonNull String attribute, @NonNull String indent)
+            throws IOException {
+        String savedValue = mVdAttributesMap.put(attribute, "#00000000");
+        writePathElement(writer, indent);
+        if (savedValue == null) {
+            mVdAttributesMap.remove(attribute);
+        } else {
+            mVdAttributesMap.put(attribute, savedValue);
+        }
+    }
+
+    private void writePathElement(@NonNull OutputStreamWriter writer, @NonNull String indent)
+            throws IOException {
+        String fillColor = mVdAttributesMap.get(SVG_FILL);
+        String strokeColor = mVdAttributesMap.get(SVG_STROKE);
+        boolean emptyFill = "none".equals(fillColor) || "#00000000".equals(fillColor);
+        boolean emptyStroke = strokeColor == null || "none".equals(strokeColor);
+        if (emptyFill && emptyStroke) {
+            return; // Nothing to draw.
+        }
+
+        writer.write(indent);
+        writer.write("<path");
+        writer.write(System.lineSeparator());
+        if (fillColor == null && mFillGradientNode == null) {
+            logger.log(Level.FINE, "Adding default fill color");
+            writer.write(indent);
+            writer.write(CONTINUATION_INDENT);
+            writer.write("android:fillColor=\"#FF000000\"");
+            writer.write(System.lineSeparator());
+        }
+        if (!emptyStroke
+                && !mVdAttributesMap.containsKey(SVG_STROKE_WIDTH)
+                && mStrokeGradientNode == null) {
+            logger.log(Level.FINE, "Adding default stroke width");
+            writer.write(indent);
+            writer.write(CONTINUATION_INDENT);
+            writer.write("android:strokeWidth=\"1\"");
+            writer.write(System.lineSeparator());
+        }
+
+        // Last, write the path data and all associated attributes.
+        writer.write(indent);
+        writer.write(CONTINUATION_INDENT);
+        writer.write("android:pathData=\"" + mPathData + "\"");
+        writeAttributeValues(writer, indent);
+        if (!hasGradient()) {
+            writer.write('/');
+        }
+        writer.write('>');
+        writer.write(System.lineSeparator());
+
+        if (mFillGradientNode != null) {
+            mFillGradientNode.writeXml(writer, indent + INDENT_UNIT);
+        }
+        if (mStrokeGradientNode != null) {
+            mStrokeGradientNode.writeXml(writer, indent + INDENT_UNIT);
+        }
+        if (hasGradient()) {
+            writer.write(indent);
+            writer.write("</path>");
+            writer.write(System.lineSeparator());
+        }
     }
 }

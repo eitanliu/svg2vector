@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 The Android Open Source Project
+ * Copyright (C) 2017 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,27 +15,26 @@
  */
 package com.android.ide.common.vectordrawable;
 
-import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
-import org.w3c.dom.NamedNodeMap;
+import com.android.annotations.NonNull;
 
-/** Used to represent one VectorDrawable's element, can be a group or path. */
-abstract class VdElement {
-    String mName;
+/**
+ * Indicates that the input vector drawable XML file included references to other Android resources.
+ */
+public class ResourcesNotSupportedException extends RuntimeException {
+    private final String name;
+    private final String value;
 
-    boolean isClipPath;
-
-    public String getName() {
-        return mName;
+    public ResourcesNotSupportedException(@NonNull String name, @NonNull String value) {
+        super(String.format("Cannot process attribute %1$s=\"%2$s\"", name, value));
+        this.name = name;
+        this.value = value;
     }
 
-    public abstract void draw(Graphics2D g, AffineTransform currentMatrix, float scaleX, float scaleY);
+    public String getName() {
+        return name;
+    }
 
-    public abstract void parseAttributes(NamedNodeMap attributes);
-
-    public abstract boolean isGroup();
-
-    public void setClipPath(boolean isClip) {
-        isClipPath = isClip;
+    public String getValue() {
+        return value;
     }
 }

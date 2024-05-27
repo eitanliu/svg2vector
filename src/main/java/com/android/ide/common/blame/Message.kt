@@ -14,60 +14,77 @@
  * limitations under the License.
  */
 
-package com.android.ide.common.blame;
+package com.android.ide.common.blame
 
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Objects;
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+data class Message(
+    val kind: Kind,
+    val text: String,
+    /** A list of source positions. Will always contain at least one item.
+     * Must have type 'List' to satisfy KotlinBinaryCompatibilityTest*/
+    val sourceFilePositions: List<SourceFilePosition> = ImmutableList.of(SourceFilePosition.UNKNOWN),
+    val rawMessage: String = text,
+    val toolName: String? = null
+) {
 
-import java.io.File;
-import java.util.List;
+    init {
+        if (sourceFilePositions.isEmpty()) {
+            throw IllegalArgumentException("Source file positions cannot be empty.")
+        }
+    }
 
-public final class Message {
-
-    @NotNull
-    private final Kind mKind;
-
-    @NotNull
-    private final String mText;
-
-    @NotNull
-    private final List<SourceFilePosition> mSourceFilePositions;
-
-    @NotNull
-    private final String mRawMessage;
-
-    @NotNull
-    private final Optional<String> mToolName;
+    val sourcePath: String?
+        get() {
+            val file = sourceFilePositions[0].file.sourceFile ?: return null
+            return file.absolutePath
+        }
 
     /**
-     * Create a new message, which has a {@link Kind}, a String which will be shown to the user and
-     * at least one {@link SourceFilePosition}.
+     * Returns a legacy 1-based line number.
+     */
+    @Deprecated(
+            "Use sourceFilePositions",
+            ReplaceWith("sourceFilePositions[0].position.startLine + 1")
+    )
+    val lineNumber: Int
+        get() = sourceFilePositions[0].position.startLine + 1
+
+    /**
+     * @return a legacy 1-based column number.
+     */
+    @Deprecated(
+            "Use sourceFilePositions",
+            ReplaceWith("sourceFilePositions[0].position.startColumn + 1")
+    )
+    val column: Int
+        get() = sourceFilePositions[0].position.startColumn + 1
+
+    /**
+     * Create a new message, which has a [Kind], a String which will be shown to the user and
+     * at least one [SourceFilePosition].
      *
      * @param kind the message type.
      * @param text the text of the message.
      * @param sourceFilePosition the first source file position the message .
      * @param sourceFilePositions any additional source file positions, may be empty.
      */
-    public Message(@NotNull Kind kind,
-            @NotNull String text,
-            @NotNull SourceFilePosition sourceFilePosition,
-            @NotNull SourceFilePosition... sourceFilePositions) {
-        mKind = kind;
-        mText = text;
-        mRawMessage = text;
-        mSourceFilePositions = ImmutableList.<SourceFilePosition>builder()
-                .add(sourceFilePosition).add(sourceFilePositions).build();
-        mToolName = Optional.absent();
-    }
+    constructor(
+        kind: Kind,
+        text: String,
+        sourceFilePosition: SourceFilePosition,
+        vararg sourceFilePositions: SourceFilePosition
+    ) : this(
+            kind = kind,
+            text = text,
+            rawMessage = text,
+            sourceFilePositions = ImmutableList.builder<SourceFilePosition>()
+                .add(sourceFilePosition).add(*sourceFilePositions).build()
+    )
 
     /**
-     * Create a new message, which has a {@link Kind}, a String which will be shown to the user and
-     * at least one {@link SourceFilePosition}.
+     * Create a new message, which has a [Kind], a String which will be shown to the user and
+     * at least one [SourceFilePosition].
      *
      * It also has a rawMessage, to store the original string for cases when the message is
      * constructed by parsing the output from another tool.
@@ -79,140 +96,72 @@ public final class Message {
      * @param sourceFilePosition the first source file position.
      * @param sourceFilePositions any additional source file positions, may be empty.
      */
-    public Message(@NotNull Kind kind,
-            @NotNull String text,
-            @NotNull String rawMessage,
-            @Nullable String toolName,
-            @NotNull SourceFilePosition sourceFilePosition,
-            @NotNull SourceFilePosition... sourceFilePositions) {
-        mKind = kind;
-        mText = text;
-        mRawMessage = rawMessage;
-        mToolName = Optional.fromNullable(toolName);
-        mSourceFilePositions = ImmutableList.<SourceFilePosition>builder()
-                .add(sourceFilePosition).add(sourceFilePositions).build();
-    }
+    constructor(
+        kind: Kind,
+        text: String,
+        rawMessage: String,
+        toolName: String?,
+        sourceFilePosition: SourceFilePosition,
+        vararg sourceFilePositions: SourceFilePosition
+    ) : this(
+            kind = kind,
+            text = text,
+            rawMessage = rawMessage,
+            toolName = toolName,
+            sourceFilePositions = ImmutableList.builder<SourceFilePosition>()
+                .add(sourceFilePosition).add(*sourceFilePositions).build()
+    )
 
-    public Message(@NotNull Kind kind,
-            @NotNull String text,
-            @NotNull String rawMessage,
-            @NotNull Optional<String> toolName,
-            @NotNull ImmutableList<SourceFilePosition> positions) {
-        mKind = kind;
-        mText = text;
-        mRawMessage = rawMessage;
-        mToolName = toolName;
+    constructor(
+        kind: Kind,
+        text: String,
+        rawMessage: String,
+        toolName: String?,
+        positions: ImmutableList<SourceFilePosition>
+    ) : this(
+            kind = kind,
+            text = text,
+            rawMessage = rawMessage,
+            toolName = toolName,
+            sourceFilePositions = if (positions.isEmpty()) {
+                ImmutableList.of(SourceFilePosition.UNKNOWN)
+            } else {
+                positions
+            }
+    )
 
-        if (positions.isEmpty()) {
-            mSourceFilePositions = ImmutableList.of(SourceFilePosition.UNKNOWN);
-        } else {
-            mSourceFilePositions = positions;
-        }
-    }
+    @Deprecated("Used by kotlin plugin.")
+    constructor(
+        kind: Kind,
+        text: String,
+        rawMessage: String,
+        toolName: com.google.common.base.Optional<String>,
+        positions: ImmutableList<SourceFilePosition>
+    ) : this(
+            kind = kind,
+            text = text,
+            rawMessage = rawMessage,
+            toolName = toolName.orNull(),
+            sourceFilePositions = if (positions.isEmpty()) {
+                ImmutableList.of(SourceFilePosition.UNKNOWN)
+            } else {
+                positions
+            }
+    )
 
-    @NotNull
-    public Kind getKind() {
-        return mKind;
-    }
-
-    @NotNull
-    public String getText() {
-        return mText;
-    }
-
-    /**
-     * Returns a list of source positions. Will always contain at least one item.
-     */
-    @NotNull
-    public List<SourceFilePosition> getSourceFilePositions() {
-        return mSourceFilePositions;
-    }
-
-    @NotNull
-    public String getRawMessage() {
-        return mRawMessage;
-    }
-
-    @NotNull
-    public Optional<String> getToolName() {
-        return mToolName;
-    }
-
-    @Nullable
-    public String getSourcePath() {
-        File file = mSourceFilePositions.get(0).getFile().getSourceFile();
-        if (file == null) {
-            return null;
-        }
-        return file.getAbsolutePath();
-    }
-
-    /**
-     * Returns a legacy 1-based line number.
-     */
-    @Deprecated
-    public int getLineNumber() {
-        return mSourceFilePositions.get(0).getPosition().getStartLine() + 1;
-    }
-
-    /**
-     * @return a legacy 1-based column number.
-     */
-    @Deprecated
-    public int getColumn() {
-        return mSourceFilePositions.get(0).getPosition().getStartColumn() + 1;
-    }
-
-    public enum Kind {
+    enum class Kind {
         ERROR, WARNING, INFO, STATISTICS, UNKNOWN, SIMPLE;
 
-        public static Kind findIgnoringCase(String s, Kind defaultKind) {
-            for (Kind kind : values()) {
-                if (kind.toString().equalsIgnoreCase(s)) {
-                    return kind;
+        companion object {
+            @JvmStatic
+            fun findIgnoringCase(s: String, defaultKind: Kind?): Kind? {
+                for (kind in values()) {
+                    if (kind.toString().equals(s, ignoreCase = true)) {
+                        return kind
+                    }
                 }
+                return defaultKind
             }
-            return defaultKind;
         }
-
-        @Nullable
-        public static Kind findIgnoringCase(String s) {
-            return findIgnoringCase(s, null);
-        }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Message)) {
-            return false;
-        }
-        Message that = (Message) o;
-        return Objects.equal(mKind, that.mKind) &&
-                Objects.equal(mText, that.mText) &&
-                Objects.equal(mRawMessage, that.mRawMessage) &&
-                Objects.equal(mToolName, that.mToolName) &&
-                Objects.equal(mSourceFilePositions, that.mSourceFilePositions);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(mKind, mText, mSourceFilePositions);
-    }
-
-    @Override
-    public String toString() {
-        MoreObjects.ToStringHelper toStringHelper =
-                MoreObjects.toStringHelper(this).add("kind", mKind).add("text", mText)
-                .add("sources", mSourceFilePositions);
-        if (!mText.equals(mRawMessage)) {
-            toStringHelper.add("original message", mRawMessage);
-        }
-        if (mToolName.isPresent()) {
-            toStringHelper.add("tool name", mToolName);
-        }
-        return toStringHelper.toString();
     }
 }

@@ -13,281 +13,267 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.android.ide.common.vectordrawable;
 
+import static com.google.common.math.DoubleMath.roundToInt;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
 import com.android.ide.common.util.AssetUtil;
-import com.google.common.base.Charsets;
-
-import org.apache.xml.serialize.OutputFormat;
-import org.apache.xml.serialize.XMLSerializer;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.android.utils.XmlUtils;
+import com.google.common.base.Strings;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.math.RoundingMode;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-
-import java.awt.image.BufferedImage;
-import java.io.*;
 
 /**
- * Generate a Image based on the VectorDrawable's XML content.
- *
- * <p>This class also contains a main method, which can be used to preview a vector drawable file.
+ * Generates an image based on the VectorDrawable's XML content.
  */
 public class VdPreview {
-
     private static final String ANDROID_ALPHA = "android:alpha";
+    private static final String ANDROID_TINT = "android:tint";
     private static final String ANDROID_AUTO_MIRRORED = "android:autoMirrored";
     private static final String ANDROID_HEIGHT = "android:height";
     private static final String ANDROID_WIDTH = "android:width";
-    public static final int MAX_PREVIEW_IMAGE_SIZE = 4096;
-    public static final int MIN_PREVIEW_IMAGE_SIZE = 1;
+    private static final int MAX_PREVIEW_IMAGE_SIZE = 4096;
+    private static final int MIN_PREVIEW_IMAGE_SIZE = 1;
 
     /**
-     * This encapsulates the information used to determine the preview image size.
-     * The reason we have different ways here is that both Studio UI and build process need
-     * to use this common code path to generate images for vectordrawable.
-     * When {@value mUseWidth} is true, use {@code mImageMaxDimension} as the maximum
-     * dimension value while keeping the aspect ratio.
-     * Otherwise, use {@code mImageScale} to scale the image based on the XML's size information.
+     * Encapsulates the information used to determine the preview image size. The reason we have
+     * different ways here is that both Studio UI and build process need to use this common code
+     * path to generate images for vector drawables. When {@code maxDimension} is not zero, use
+     * {@code maxDimension} as the maximum dimension value while keeping the aspect ratio.
+     * Otherwise, use {@code imageScale} to scale the image based on the XML's size information.
      */
     public static class TargetSize {
-        private boolean mUseWidth;
+        private final int imageMaxDimension;
+        private final double imageScale;
 
-        private int mImageMaxDimension;
-        private float mImageScale;
-
-        private TargetSize(boolean useWidth, int imageWidth, float imageScale) {
-            mUseWidth = useWidth;
-            mImageMaxDimension = imageWidth;
-            mImageScale = imageScale;
+        private TargetSize(int maxDimension, double imageScale) {
+            this.imageMaxDimension = maxDimension;
+            this.imageScale = imageScale;
         }
 
-        public static TargetSize createSizeFromWidth(int imageWidth) {
-            return new TargetSize(true, imageWidth, 0.0f);
+        public static TargetSize createFromMaxDimension(int maxDimension) {
+            return new TargetSize(maxDimension, 0);
         }
 
-        public static TargetSize createSizeFromScale(float imageScale) {
-            return new TargetSize(false, 0, imageScale);
+        public static TargetSize createFromScale(double imageScale) {
+            return new TargetSize(0, imageScale);
         }
     }
 
-    /**
-     * Since we allow overriding the vector drawable's size, we also need to keep
-     * the original size and aspect ratio.
-     */
-    public static class SourceSize {
-        public int getHeight() {
-            return mSourceHeight;
-        }
-
-        public int getWidth() {
-            return mSourceWidth;
-        }
-
-        private int mSourceWidth;
-        private int mSourceHeight;
-    }
-
-
-    /**
-     * @return a format object for XML formatting.
-     */
-    @NotNull
-    private static OutputFormat getPrettyPrintFormat() {
-        OutputFormat format = new OutputFormat();
-        format.setLineWidth(120);
-        format.setIndenting(true);
-        format.setIndent(4);
-        format.setEncoding("UTF-8");
-        format.setOmitComments(true);
-        return format;
+    /** Returns a format object for XML formatting. */
+    @NonNull
+    private static Transformer getPrettyPrintTransformer()
+            throws TransformerConfigurationException {
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformerFactory.newTransformer();
+        transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+        transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+        transformer.setOutputProperty(OutputKeys.VERSION, "1.0");
+        return transformer;
     }
 
     /**
-     * Get the vector drawable's original size.
-     */
-    public static SourceSize getVdOriginalSize(@NotNull Document document) {
-        Element root = document.getDocumentElement();
-        SourceSize srcSize = new SourceSize();
-        // Update attributes, note that attributes as width and height are required,
-        // while others are optional.
-        NamedNodeMap attr = root.getAttributes();
-        Node nodeAttr = attr.getNamedItem(ANDROID_WIDTH);
-        assert nodeAttr != null;
-        srcSize.mSourceWidth = parseDimension(0, nodeAttr, false);
-
-        nodeAttr = attr.getNamedItem(ANDROID_HEIGHT);
-        assert nodeAttr != null;
-        srcSize.mSourceHeight = parseDimension(0, nodeAttr, false);
-        return srcSize;
-    }
-
-    /**
-     * The UI can override some properties of the Vector drawable.
-     * In order to override in an uniform way, we re-parse the XML file
-     * and pick the appropriate attributes to override.
+     * The UI can override some properties of the Vector drawable. In order to override in
+     * an uniform way, we re-parse the XML file and pick the appropriate attributes to override.
      *
      * @param document the parsed document of original VectorDrawable's XML file.
-     * @param info incoming override information for VectorDrawable.
+     * @param overrideInfo incoming override information for VectorDrawable.
      * @param errorLog log for the parsing errors and warnings.
-     * @param srcSize as an output, store the original size of the VectorDrawable
-     * @return the overridden XML file in one string. If exception happens
-     * or no attributes needs to be overriden, return null.
+     * @return the overridden XML, or null if exception happens or no attributes need to be
+     *     overridden.
      */
     @Nullable
-    public static String overrideXmlContent(@NotNull Document document,
-                                            @NotNull VdOverrideInfo info,
-                                            @Nullable StringBuilder errorLog) {
-        boolean isXmlFileContentChanged = false;
+    public static String overrideXmlContent(
+            @NonNull Document document,
+            @NonNull VdOverrideInfo overrideInfo,
+            @Nullable StringBuilder errorLog) {
+        boolean contentChanged = false;
         Element root = document.getDocumentElement();
 
         // Update attributes, note that attributes as width and height are required,
         // while others are optional.
-        NamedNodeMap attr = root.getAttributes();
-        if (info.needsOverrideWidth()) {
-            Node nodeAttr = attr.getNamedItem(ANDROID_WIDTH);
-            int overrideValue = info.getWidth();
-            int originalValue = parseDimension(overrideValue, nodeAttr, true);
-            if (originalValue != overrideValue) {
-                isXmlFileContentChanged = true;
+        if (overrideInfo.needsOverrideWidth()) {
+            if (setDimension(root, ANDROID_WIDTH, overrideInfo.getWidth())) {
+                contentChanged = true;
             }
         }
-        if (info.needsOverrideHeight()) {
-            Node nodeAttr = attr.getNamedItem(ANDROID_HEIGHT);
-            int overrideValue = info.getHeight();
-            int originalValue = parseDimension(overrideValue, nodeAttr, true);
-            if (originalValue != overrideValue) {
-                isXmlFileContentChanged = true;
+        if (overrideInfo.needsOverrideHeight()) {
+            if (setDimension(root, ANDROID_HEIGHT, overrideInfo.getHeight())) {
+                contentChanged = true;
             }
         }
-        if (info.needsOverrideOpacity()) {
-            Node nodeAttr = attr.getNamedItem(ANDROID_ALPHA);
-            String opacityValue = String.format("%.2f", info.getOpacity() / 100.0f);
-            if (nodeAttr != null) {
-                nodeAttr.setTextContent(opacityValue);
+        if (overrideInfo.needsOverrideAlpha()) {
+            String value = XmlUtils.formatFloatValue(overrideInfo.getAlpha());
+            if (setAttributeValue(root, ANDROID_ALPHA, value)) {
+                contentChanged = true;
             }
-            else {
-                root.setAttribute(ANDROID_ALPHA, opacityValue);
-            }
-            isXmlFileContentChanged = true;
-        }
-        // When auto mirror is set to true, then we always need to set it.
-        // Because SVG has no such attribute at all.
-        if (info.needsOverrideAutoMirrored()) {
-            Node nodeAttr = attr.getNamedItem(ANDROID_AUTO_MIRRORED);
-            if (nodeAttr != null) {
-                nodeAttr.setTextContent("true");
-            }
-            else {
-                root.setAttribute(ANDROID_AUTO_MIRRORED, "true");
-            }
-            isXmlFileContentChanged = true;
         }
 
-        if (isXmlFileContentChanged) {
-            // Prettify the XML string from the document.
-            StringWriter stringOut = new StringWriter();
-            XMLSerializer serial = new XMLSerializer(stringOut, getPrettyPrintFormat());
-            try {
-                serial.serialize(document);
+        if (overrideInfo.needsOverrideTint()) {
+            String value = String.format("#%06X", overrideInfo.tintRgb());
+            if (setAttributeValue(root, ANDROID_TINT, value)) {
+                contentChanged = true;
             }
-            catch (IOException e) {
+        }
+
+        if (overrideInfo.getAutoMirrored()) {
+            if (setAttributeValue(root, ANDROID_AUTO_MIRRORED, "true")) {
+                contentChanged = true;
+            }
+        }
+
+        if (contentChanged) {
+            // Pretty-print the XML string from the document.
+            StringWriter stringOut = new StringWriter();
+
+            try {
+                Transformer transformer = getPrettyPrintTransformer();
+                transformer.transform(new DOMSource(document), new StreamResult(stringOut));
+            } catch (TransformerException e) {
                 if (errorLog != null) {
-                    errorLog.append("Exception while parsing XML file:\n").append(e.getMessage());
+                    errorLog.append("Exception while serializing XML file:\n")
+                            .append(e.getMessage());
                 }
             }
             return stringOut.toString();
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
-     * Query the dimension info and override it if needed.
-     *
-     * @param overrideValue the dimension value to override with.
-     * @param nodeAttr the node who contains dimension info.
-     * @param override if true then override the dimension.
-     * @return the original dimension value.
+     * Sets value of a dimension attribute. The returned value reflects whether the value of
+     * the attribute was changed or not.
      */
-    private static int parseDimension(int overrideValue, Node nodeAttr, boolean override) {
-        assert nodeAttr != null;
-        String content = nodeAttr.getTextContent();
-        assert content.endsWith("dp");
-        int originalValue = Integer.parseInt(content.substring(0, content.length() - 2));
-
-        if (override) {
-            nodeAttr.setTextContent(overrideValue + "dp");
-        }
-        return originalValue;
+    private static boolean setDimension(
+            @NonNull Element element, @NonNull String attrName, double value) {
+        String newValue = XmlUtils.formatFloatValue(value) + "dp";
+        return setAttributeValue(element, attrName, newValue);
     }
 
     /**
-     * This generates an image according to the VectorDrawable's content {@code xmlFileContent}.
-     * At the same time, {@vdErrorLog} captures all the errors found during parsing.
+     * Sets value of an attribute. The returned value reflects whether the value of the attribute
+     * was changed or not.
+     */
+    private static boolean setAttributeValue(
+            @NonNull Element element, @NonNull String attrName, @NonNull String value) {
+        String oldValue = element.getAttribute(attrName);
+        element.setAttribute(attrName, value);
+        return !value.equals(oldValue);
+    }
+
+    /**
+     * Generates an image according to the VectorDrawable's content {@code xmlFileContent}.
+     * At the same time, {@code vdErrorLog} captures all the errors found during parsing.
      * The size of image is determined by the {@code size}.
      *
      * @param targetSize the size of result image.
      * @param xmlFileContent  VectorDrawable's XML file's content.
-     * @param vdErrorLog      log for the parsing errors and warnings.
+     * @param errorLog      log for the parsing errors and warnings.
      * @return an preview image according to the VectorDrawable's XML
      */
     @Nullable
-    public static BufferedImage getPreviewFromVectorXml(@NotNull TargetSize targetSize,
+    public static BufferedImage getPreviewFromVectorXml(@NonNull TargetSize targetSize,
                                                         @Nullable String xmlFileContent,
-                                                        @Nullable StringBuilder vdErrorLog) {
-        if (xmlFileContent == null || xmlFileContent.isEmpty()) {
-            return null;
-        }
-        VdParser p = new VdParser();
-        VdTree vdTree;
-
-        InputStream inputStream = new ByteArrayInputStream(
-                xmlFileContent.getBytes(Charsets.UTF_8));
-        vdTree = p.parse(inputStream, vdErrorLog);
-        if (vdTree == null) {
+                                                        @Nullable StringBuilder errorLog) {
+        if (Strings.isNullOrEmpty(xmlFileContent)) {
             return null;
         }
 
+        InputStream inputStream = new ByteArrayInputStream(xmlFileContent.getBytes(UTF_8));
+        VdTree vdTree = VdParser.parse(inputStream, errorLog);
+
+        return getPreviewFromVectorTree(targetSize, vdTree, errorLog);
+    }
+
+    /**
+     * This generates an image from a vector tree.
+     * The size of image is determined by the {@code size}.
+     *
+     * @param targetSize the size of result image.
+     * @param xml        The vector drawable XML document
+     * @param vdErrorLog log for the errors and warnings.
+     * @return an preview image according to the VectorDrawable's XML
+     */
+    @NonNull
+    public static BufferedImage getPreviewFromVectorDocument(@NonNull TargetSize targetSize,
+                                                             @NonNull Document xml,
+                                                             @Nullable StringBuilder vdErrorLog) {
+        VdTree vdTree = new VdTree();
+        vdTree.parse(xml);
+        return getPreviewFromVectorTree(targetSize, vdTree, vdErrorLog);
+    }
+
+    /**
+     * Generates an image from a vector tree. The size of image is determined by the {@code size}.
+     *
+     * @param targetSize the size of result image.
+     * @param vdTree     The vector drawable
+     * @param errorLog log for the errors and warnings.
+     * @return an preview image according to the VectorDrawable's XML
+     */
+    @NonNull
+    public static BufferedImage getPreviewFromVectorTree(@NonNull TargetSize targetSize,
+                                                         @NonNull VdTree vdTree,
+                                                         @Nullable StringBuilder errorLog) {
         // If the forceImageSize is set (>0), then we honor that.
-        // Otherwise, we will ask the vectorDrawable for the prefer size, then apply the imageScale.
-        float vdWidth = vdTree.getBaseWidth();
-        float vdHeight = vdTree.getBaseHeight();
-        float imageWidth;
-        float imageHeight;
-        int forceImageSize = targetSize.mImageMaxDimension;
-        float imageScale = targetSize.mImageScale;
+        // Otherwise, we will ask the vector drawable for the prefer size, then apply the imageScale.
+        double vdWidth = vdTree.getBaseWidth();
+        double vdHeight = vdTree.getBaseHeight();
+        double imageWidth;
+        double imageHeight;
+        int forceImageSize = targetSize.imageMaxDimension;
+        double imageScale = targetSize.imageScale;
 
         if (forceImageSize > 0) {
-            // The goal here is to generate an image within certain size, while keeping the
-            // aspect ration as much as we can.
-            // If it is scaling too much to fit in, we log an error.
-            float maxVdSize = Math.max(vdWidth, vdHeight);
-            float ratioToForceImageSize = forceImageSize / maxVdSize;
-            float scaledWidth = ratioToForceImageSize * vdWidth;
-            float scaledHeight = ratioToForceImageSize * vdHeight;
-            imageWidth = Math.max(MIN_PREVIEW_IMAGE_SIZE, Math.min(MAX_PREVIEW_IMAGE_SIZE, scaledWidth));
-            imageHeight = Math.max(MIN_PREVIEW_IMAGE_SIZE, Math.min(MAX_PREVIEW_IMAGE_SIZE, scaledHeight));
-            if (scaledWidth != imageWidth || scaledHeight != imageHeight) {
-                vdErrorLog.append("Invalid image size, can't fit in a square whose size is" + forceImageSize);
+            // The goal here is to generate an image within certain size, while preserving
+            // the aspect ratio as accurately as we can. If it is scaling too much to fit in,
+            // we log an error.
+            double maxVdSize = Math.max(vdWidth, vdHeight);
+            double ratioToForceImageSize = forceImageSize / maxVdSize;
+            double scaledWidth = ratioToForceImageSize * vdWidth;
+            double scaledHeight = ratioToForceImageSize * vdHeight;
+            imageWidth =
+                    limitToInterval(scaledWidth, MIN_PREVIEW_IMAGE_SIZE, MAX_PREVIEW_IMAGE_SIZE);
+            imageHeight =
+                    limitToInterval(scaledHeight, MIN_PREVIEW_IMAGE_SIZE, MAX_PREVIEW_IMAGE_SIZE);
+            if (errorLog != null && (scaledWidth != imageWidth || scaledHeight != imageHeight)) {
+                errorLog.append("Invalid image size, can't fit in a square whose size is ")
+                        .append(forceImageSize);
             }
         } else {
             imageWidth = vdWidth * imageScale;
             imageHeight = vdHeight * imageScale;
         }
 
-        // Create the image according to the vectorDrawable's aspect ratio.
-
-        BufferedImage image = AssetUtil.newArgbBufferedImage((int)imageWidth, (int)imageHeight);
+        // Create the image according to the vector drawable's aspect ratio.
+        BufferedImage image =
+                AssetUtil.newArgbBufferedImage(
+                        roundToInt(imageWidth, RoundingMode.HALF_UP),
+                        roundToInt(imageHeight, RoundingMode.HALF_UP));
         vdTree.drawIntoImage(image);
         return image;
     }
 
-    public static void main(String[] args) {
-        System.out.println("Hello from sdk-common-lib.");
+    private static double limitToInterval(double value, double begin, double end) {
+        return Math.max(begin, Math.min(end, value));
     }
 }

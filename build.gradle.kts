@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.eitanliu"
-version = "1.0-SNAPSHOT"
+version = "1.0.1"
 
 repositories {
     mavenCentral()
@@ -27,7 +27,7 @@ dependencies {
     // With compose.desktop.common you will also lose @Preview functionality
     implementation("com.google.guava:guava:33.0.0-jre")
     implementation("commons-cli:commons-cli:1.2")
-    implementation("xerces:xercesImpl:2.12.1")
+    // implementation("xerces:xercesImpl:2.12.1")
     // implementation("javax.xml.bind:jaxb-api:2.3.1")
     // implementation("org.glassfish.jaxb:jaxb-runtime:2.3.1")
     // implementation(compose.desktop.currentOs)
