@@ -5,19 +5,24 @@ apply {
 fun findMain(): String? {
     val extension = project.extensions.getByType<JavaPluginExtension>()
     val allSource = extension.sourceSets.getByName("main").allSource
-    return allSource.find {
-        it.readText().contains("fun main(")
-    }?.let { file ->
+    return allSource.firstNotNullOfOrNull find@{ file ->
+        val text = file.readText()
+        return@find when {
+            text.contains("fun main(") -> file to true
+            text.contains("public static void main(String") -> file to false
+            else -> null
+        }
+    }?.let { (file, isKotlin) ->
         println("")
         println("Main-Class find $file")
         val parent = allSource.srcDirs.find {
             file.absolutePath.startsWith(it.absolutePath)
         } ?: return@let null
         val srcFile = file.relativeTo(parent)
-        val packageName = srcFile.parent.orEmpty().replace(File.separator, ".")
-        val className = srcFile.nameWithoutExtension
-        println("Main-Class find $parent, $packageName${className}Kt")
-        "$packageName${className}Kt"
+        val packageName = srcFile.parent?.run { "${replace(File.separator, ".")}." }.orEmpty()
+        val className = srcFile.nameWithoutExtension + "Kt".takeIf { isKotlin }.orEmpty()
+        println("Main-Class find ${srcFile.parent}, $packageName${className}")
+        "$packageName${className}"
     }
 }
 
