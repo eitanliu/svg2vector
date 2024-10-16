@@ -15,11 +15,13 @@
  */
 package com.android.ide.common.vectordrawable;
 
+
+import com.android.annotations.NonNull;
+
 import java.awt.geom.Path2D;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Given an array of {@link VdPath.Node}, generates a Path2D object.
@@ -30,7 +32,7 @@ import org.jetbrains.annotations.NotNull;
 class VdNodeRender {
     private static final Logger LOGGER = Logger.getLogger(VdNodeRender.class.getSimpleName());
 
-    public static void createPath(@NotNull VdPath.Node[] nodes, @NotNull Path2D path) {
+    public static void createPath(@NonNull VdPath.Node[] nodes, @NonNull Path2D path) {
         float[] current = new float[6];
         char lastCmd = ' ';
         for (VdPath.Node node : nodes) {
@@ -39,7 +41,7 @@ class VdNodeRender {
         }
     }
 
-    private static void addCommand(@NotNull Path2D path, float[] current, char cmd, char lastCmd,
+    private static void addCommand(@NonNull Path2D path, float[] current, char cmd, char lastCmd,
             float[] val) {
         int incr = 2;
 
@@ -268,7 +270,7 @@ class VdNodeRender {
         current[5] = loopY;
     }
 
-    private static void drawArc(@NotNull Path2D p, double x0, double y0, double x1, double y1,
+    private static void drawArc(@NonNull Path2D p, double x0, double y0, double x1, double y1,
             double a, double b, double theta, boolean isMoreThanHalf, boolean isPositiveArc) {
         LOGGER.log(Level.FINE, "(" + x0 + "," + y0 + ")-(" + x1 + "," + y1
                 + ") {" + a + " " + b + "}");
@@ -359,7 +361,7 @@ class VdNodeRender {
      * @param start The start angle of the arc on the ellipse
      * @param sweep The angle (positive or negative) of the sweep of the arc on the ellipse
      */
-    private static void arcToBezier(@NotNull Path2D p, double cx, double cy, double a, double b,
+    private static void arcToBezier(@NonNull Path2D p, double cx, double cy, double a, double b,
             double e1x, double e1y, double theta, double start, double sweep) {
         // Taken from equations at:
         // http://spaceroots.org/documents/ellipse/node8.html

@@ -3,9 +3,10 @@
 plugins {
     kotlin("jvm")
     id("java")
-    id("application")
     // id("org.jetbrains.compose")
 }
+
+apply(from = rootProject.file("gradle/application_manifest.gradle.kts"))
 
 group = "com.eitanliu"
 version = "1.0.1"
@@ -16,17 +17,13 @@ repositories {
     google()
 }
 
-application {
-    mainClass = "MainKt"
-}
-
 dependencies {
     // Note, if you develop a library, you should use compose.desktop.common.
     // compose.desktop.currentOs should be used in launcher-sourceSet
     // (in a separate module for demo project and in testMain).
     // With compose.desktop.common you will also lose @Preview functionality
     implementation("com.google.guava:guava:33.0.0-jre")
-    implementation("commons-cli:commons-cli:1.2")
+    implementation("commons-cli:commons-cli:1.4")
     // implementation("xerces:xercesImpl:2.12.1")
     // implementation("javax.xml.bind:jaxb-api:2.3.1")
     // implementation("org.glassfish.jaxb:jaxb-runtime:2.3.1")
