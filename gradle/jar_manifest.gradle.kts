@@ -1,7 +1,3 @@
-apply {
-    plugin("application")
-}
-
 fun findMain(): String? {
     val extension = project.extensions.getByType<JavaPluginExtension>()
     val allSource = extension.sourceSets.getByName("main").allSource
@@ -32,27 +28,29 @@ fun findMain(): String? {
     }
 }
 
-project.configure<JavaApplication> {
-    mainClass = findMain() ?: "MainKt"
-}
-
 afterEvaluate {
 
-    project.tasks.getByName<Jar>("jar") {
+    tasks.register<Jar>("jarPackage") {
+        group = "build"
 
+        // archiveBaseName-archiveAppendix-archiveVersion-archiveClassifier
+        archiveClassifier = "dist"
         exclude("META-INF/**LICENSE*")
         exclude("META-INF/**NOTICE*")
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
         val runtimeClasses = configurations["runtimeClasspath"]
+        val sourceSets = project.extensions.getByType<JavaPluginExtension>().sourceSets
 
         manifest {
             attributes["Main-Class"] = findMain()
-            attributes["Class-Path"] = runtimeClasses.filter { it.exists() }
-                .joinToString(" ") { it.name }
             println("")
-            println("jar META-INF/MANIFEST.MF")
+            println("jarPackage META-INF/MANIFEST.MF")
             attributes.forEach { t, u -> println("$t: $u") }
         }
+
+        from(sourceSets["main"].output)
+        from(runtimeClasses.map { if (it.isDirectory) it else zipTree(it) })
+        dependsOn(runtimeClasses)
     }
 }

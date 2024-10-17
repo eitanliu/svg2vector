@@ -6,10 +6,11 @@ plugins {
     // id("org.jetbrains.compose")
 }
 
-apply(from = rootProject.file("gradle/application_manifest.gradle.kts"))
-
 group = "com.eitanliu"
 version = "1.0.1"
+
+apply(from = rootProject.file("gradle/application_manifest.gradle.kts"))
+apply(from = rootProject.file("gradle/jar_manifest.gradle.kts"))
 
 repositories {
     mavenCentral()
