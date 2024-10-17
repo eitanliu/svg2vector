@@ -4,6 +4,11 @@
 
 Add `svg2vertor/bin` to Path.  
 
+JVM
+```shell
+java -jar svg2vector-1.0.1.jar -d ./
+```
+
 Linux/Mac
 ```shell
 svg2vector -d ./input_dir -o ./output_dir
@@ -12,6 +17,17 @@ svg2vector -d ./input_dir -o ./output_dir
 Windows
 ```cmd
 svg2vector.bat -d .\input_dir -o .\output_dir
+```
+
+## Build
+
+```shell
+# build Tar and Zip
+# build Tar ./gradlew distTar
+# build Zip ./gradlew distZip
+./gradlew assembleDist
+# build jar
+./gradlew jarPackage
 ```
 
 ## Sources
@@ -32,4 +48,5 @@ https://android.googlesource.com/platform/tools/base/+/refs/heads/main/common/sr
 https://android.googlesource.com/platform/tools/base/+/refs/heads/main/common/src/main/java/com/android/utils
 https://android.googlesource.com/platform/tools/base/+/refs/heads/main/common/src/main/java/com/android/SdkConstants.java
 ```
+
 [Guava](https://android.googlesource.com/platform/external/guava/)

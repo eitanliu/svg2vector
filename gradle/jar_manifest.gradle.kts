@@ -34,7 +34,7 @@ afterEvaluate {
         group = "build"
 
         // archiveBaseName-archiveAppendix-archiveVersion-archiveClassifier
-        archiveClassifier = "dist"
+        // archiveClassifier = "dist"
         exclude("META-INF/**LICENSE*")
         exclude("META-INF/**NOTICE*")
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -51,6 +51,7 @@ afterEvaluate {
 
         from(sourceSets["main"].output)
         from(runtimeClasses.map { if (it.isDirectory) it else zipTree(it) })
+        destinationDirectory.set(layout.buildDirectory.file("distributions").get().asFile)
         dependsOn(runtimeClasses)
     }
 }
