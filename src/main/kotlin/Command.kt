@@ -1,10 +1,10 @@
 import com.android.ide.common.vectordrawable.Svg2Vector
 import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.CommandLineParser
+import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.HelpFormatter
 import org.apache.commons.cli.Options
 import org.apache.commons.cli.ParseException
-import org.apache.commons.cli.PosixParser
 import java.io.File
 import java.io.IOException
 import java.util.zip.GZIPInputStream
@@ -15,23 +15,18 @@ object Command {
 
     @JvmStatic
     fun parse(args: Array<String>) {
-        val opt: Options = Options()
-        opt.addOption("d", "dir", true, "the target svg directory")
-        opt.addOption("f", "file", true, "the target svg file")
-        opt.addOption("o", "output", true, "the output vector file or directory")
-
-        val formatter = HelpFormatter()
-        val parser: CommandLineParser = PosixParser()
-
-        val cl: CommandLine
-        try {
-            cl = parser.parse(opt, args)
-        } catch (e: ParseException) {
-            formatter.printHelp(HELPER_INFO, opt)
-            return
+        val opt = Options().apply {
+            addOption("d", "dir", true, "the target svg directory")
+            addOption("f", "file", true, "the target svg file")
+            addOption("o", "output", true, "the output vector file or directory")
         }
 
-        if (cl == null) {
+        val formatter = HelpFormatter()
+        val parser: CommandLineParser = DefaultParser()
+
+        val cl: CommandLine = try {
+            parser.parse(opt, args)
+        } catch (e: ParseException) {
             formatter.printHelp(HELPER_INFO, opt)
             return
         }
@@ -69,7 +64,8 @@ object Command {
             if (!inputDir.exists() || !inputDir.isDirectory) {
                 throw RuntimeException("The path [$dir] is not exist or valid directory")
             }
-            val outputDir = File(output)
+            val outputDir = output?.let { File(it) }
+                ?: throw RuntimeException("The output path is null")
             if (outputDir.exists() || outputDir.mkdirs()) {
                 svg2vectorForDirectory(inputDir, outputDir)
             } else {
@@ -82,7 +78,9 @@ object Command {
             if (!inputFile.exists() || !inputFile.isFile) {
                 throw RuntimeException("The path [$file] is not exist or valid file")
             }
-            svg2vectorForFile(inputFile, File(output))
+            val outputFile = output?.let { File(it) }
+                ?: throw RuntimeException("The output path is null")
+            svg2vectorForFile(inputFile, outputFile)
         }
     }
 
@@ -101,8 +99,7 @@ object Command {
 
     private fun svg2vectorForFile(inputFile: File, outputFile: File) {
         if (inputFile.name.endsWith(".svgz")) {
-            val tempUnzipFile =
-                File(inputFile.parent, inputFile.fixFileName() + ".svg")
+            val tempUnzipFile = File(inputFile.parent, inputFile.fixFileName() + ".svg")
             try {
                 unZipGzipFile(inputFile, tempUnzipFile)
                 svg2vectorForFile(tempUnzipFile, outputFile)

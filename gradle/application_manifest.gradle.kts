@@ -6,10 +6,16 @@ fun findMain(): String? {
     val extension = project.extensions.getByType<JavaPluginExtension>()
     val allSource = extension.sourceSets.getByName("main").allSource
     return allSource.firstNotNullOfOrNull find@{ file ->
-        val text = file.readText()
+        val lines = file.readLines()
         return@find when {
-            text.contains("fun main(") -> file to true
-            text.contains("public static void main(String") -> file to false
+            lines.any { line ->
+                line.trim().startsWith("fun main(")
+            } -> file to true
+
+            lines.any { line ->
+                line.trim().startsWith("public static void main(String")
+            } -> file to false
+
             else -> null
         }
     }?.let { (file, isKotlin) ->
