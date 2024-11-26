@@ -17,11 +17,14 @@ package com.android.ide.common.vectordrawable;
 
 import static com.android.ide.common.vectordrawable.SvgTree.getStartLine;
 
+import com.android.ConfigConstant;
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
 import com.android.utils.Pair;
+import com.android.utils.XmlUtils;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
@@ -1179,6 +1182,20 @@ public class Svg2Vector {
 
     private static void writeFile(@NonNull OutputStream outStream, @NonNull SvgTree svgTree)
             throws IOException {
+        ByteArrayOutputStream tempStream = new ByteArrayOutputStream();
+        svgTree.writeXml(tempStream);
+        if (ConfigConstant.overrideInfo != null) {
+            try {
+                Document doc = XmlUtils.parseDocument(tempStream.toString(), true);
+                String out = VdPreview.overrideXmlContent(doc, ConfigConstant.overrideInfo, null);
+                if (out != null) {
+                    outStream.write(out.getBytes());
+                    return;
+                }
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
         svgTree.writeXml(outStream);
     }
 

@@ -1,10 +1,13 @@
+import com.android.ConfigConstant
 import com.android.ide.common.vectordrawable.Svg2Vector
+import com.android.ide.common.vectordrawable.VdOverrideInfo
 import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.CommandLineParser
 import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.HelpFormatter
 import org.apache.commons.cli.Options
 import org.apache.commons.cli.ParseException
+import java.awt.Color
 import java.io.File
 import java.io.IOException
 import java.util.zip.GZIPInputStream
@@ -13,12 +16,19 @@ import java.util.zip.GZIPInputStream
 object Command {
     private const val HELPER_INFO = "-f d:/svg/a.svg -o d:/vector/a.xml"
 
+    val noOverrideInfo = VdOverrideInfo(0.0, 0.0, null, -1.0, false)
+
     @JvmStatic
     fun parse(args: Array<String>) {
         val opt = Options().apply {
             addOption("d", "dir", true, "the target svg directory")
             addOption("f", "file", true, "the target svg file")
             addOption("o", "output", true, "the output vector file or directory")
+            addOption("w", "width", true, "the width needs to be overridden.")
+            addOption("h", "height", true, "the width needs to be overridden. ")
+            addOption("a", "alpha", true, "the alpha needs to be overridden. (0.0 ~ 1.0)")
+            addOption("t", "tint", true, "the RGB value of the tint. (000000 ~ ffffff)")
+            addOption("m", "autoMirrored", true, "auto mirroring for RTL layout (default ture)")
         }
 
         val formatter = HelpFormatter()
@@ -29,6 +39,49 @@ object Command {
         } catch (e: ParseException) {
             formatter.printHelp(HELPER_INFO, opt)
             return
+        }
+
+        var overrideInfo = noOverrideInfo
+        if (cl.hasOption("w")) {
+            try {
+                val value = cl.getOptionValue("w").toDouble()
+                overrideInfo = overrideInfo.copy(width = value)
+            } catch (_: Throwable) {
+            }
+        }
+        if (cl.hasOption("h")) {
+            try {
+                val value = cl.getOptionValue("h").toDouble()
+                overrideInfo = overrideInfo.copy(height = value)
+            } catch (_: Throwable) {
+            }
+        }
+        if (cl.hasOption("a")) {
+            try {
+                val value = cl.getOptionValue("a").toDouble()
+                overrideInfo = overrideInfo.copy(alpha = value)
+            } catch (_: Throwable) {
+            }
+        }
+        if (cl.hasOption("t")) {
+            try {
+                val value = cl.getOptionValue("t").toInt(16)
+                overrideInfo = overrideInfo.copy(tint = Color(value))
+            } catch (_: Throwable) {
+            }
+        }
+        if (cl.hasOption("m")) {
+            try {
+                val value = cl.getOptionValue("m").toBoolean()
+                overrideInfo = overrideInfo.copy(autoMirrored = value)
+            } catch (_: Throwable) {
+                overrideInfo = overrideInfo.copy(autoMirrored = true)
+            }
+        } else {
+            overrideInfo = overrideInfo.copy(autoMirrored = true)
+        }
+        if (overrideInfo != noOverrideInfo) {
+            ConfigConstant.overrideInfo = overrideInfo
         }
 
         var dir: String? = null
