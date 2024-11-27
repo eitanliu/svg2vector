@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 package com.android.utils;
+
 import com.android.annotations.NonNull;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.CharBuffer;
+
 /**
  * A {@link Reader} getting its data from a {@link CharSequence}. This light-weight implementation
  * is intended for single-thread use, doesn't have any synchronization, and does not throw {@link
@@ -29,15 +31,19 @@ public final class CharSequenceReader extends Reader {
     private CharSequence seq;
     private int pos;
     private int mark;
+
     public CharSequenceReader(@NonNull CharSequence seq) {
         this.seq = seq;
     }
+
     private boolean hasRemaining() {
         return remaining() > 0;
     }
+
     private int remaining() {
         return seq.length() - pos;
     }
+
     @Override
     public int read(@NonNull CharBuffer target) {
         if (!hasRemaining()) {
@@ -49,10 +55,12 @@ public final class CharSequenceReader extends Reader {
         }
         return charsToRead;
     }
+
     @Override
     public int read() {
         return hasRemaining() ? seq.charAt(pos++) : -1;
     }
+
     @Override
     public int read(@NonNull char[] cbuf, int off, int len) {
         if (!hasRemaining()) {
@@ -64,28 +72,34 @@ public final class CharSequenceReader extends Reader {
         }
         return charsToRead;
     }
+
     @Override
     public long skip(long n) {
         int charsToSkip = (int) Math.min(remaining(), n);
         pos += charsToSkip;
         return charsToSkip;
     }
+
     @Override
     public boolean ready() {
         return true;
     }
+
     @Override
     public boolean markSupported() {
         return true;
     }
+
     @Override
     public void mark(int readAheadLimit) {
         mark = pos;
     }
+
     @Override
     public void reset() {
         pos = mark;
     }
+
     @Override
     public void close() {
         seq = null;

@@ -1,6 +1,8 @@
 import com.android.ConfigConstant
 import com.android.ide.common.vectordrawable.Svg2Vector
 import com.android.ide.common.vectordrawable.VdOverrideInfo
+import com.android.ide.common.vectordrawable.VdPreview
+import com.android.utils.XmlUtils
 import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.CommandLineParser
 import org.apache.commons.cli.DefaultParser
@@ -8,6 +10,7 @@ import org.apache.commons.cli.HelpFormatter
 import org.apache.commons.cli.Options
 import org.apache.commons.cli.ParseException
 import java.awt.Color
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
 import java.util.zip.GZIPInputStream
@@ -65,7 +68,10 @@ object Command {
         }
         if (cl.hasOption("t")) {
             try {
-                val value = cl.getOptionValue("t").toInt(16)
+                val value = cl.getOptionValue("t")
+                    .substringAfter("0x")
+                    .substringAfter("#")
+                    .toInt(16)
                 overrideInfo = overrideInfo.copy(tint = Color(value))
             } catch (_: Throwable) {
             }
@@ -164,8 +170,28 @@ object Command {
         } else if (inputFile.name.endsWith(".svg")) {
             println("${inputFile.name} → ${outputFile.name}")
             outputFile.outputStream().use { out ->
-
-                Svg2Vector.parseSvgToXml(inputFile.toPath(), out)
+                val tempStream = ByteArrayOutputStream()
+                Svg2Vector.parseSvgToXml(inputFile.toPath(), tempStream)
+                if (ConfigConstant.overrideInfo != null) {
+                    try {
+                        val doc = XmlUtils.parseDocument(
+                            tempStream.toString(), true
+                        )
+                        val docString = VdPreview.overrideXmlContent(
+                            doc, ConfigConstant.overrideInfo, null
+                        )
+                        if (docString != null) {
+                            out.write(docString.toByteArray())
+                        } else {
+                            throw NullPointerException("Override Content Error")
+                        }
+                    } catch (e: Throwable) {
+                        out.write(tempStream.toByteArray())
+                        e.printStackTrace()
+                    }
+                } else {
+                    out.write(tempStream.toByteArray())
+                }
             }
         }
     }

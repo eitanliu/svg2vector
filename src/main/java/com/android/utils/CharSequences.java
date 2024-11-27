@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.android.utils;
+
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
 import com.google.common.base.Charsets;
@@ -24,26 +26,32 @@ import java.io.Reader;
 import java.util.Arrays;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
+
 /**
  * A number of utility methods around {@link CharSequence} handling, which adds methods that are
  * available on Strings (such as {@code indexOf}, {@code startsWith} and {@code regionMatches} and
  * provides equivalent methods for character sequences.
  */
 public class CharSequences {
+
     public static int indexOf(@NonNull CharSequence sequence, char c) {
         return indexOf(sequence, c, 0);
     }
+
     public static int indexOf(@NonNull CharSequence sequence, char c, int start) {
         for (int i = start; i < sequence.length(); i++) {
             if (sequence.charAt(i) == c) {
                 return i;
             }
         }
+
         return -1;
     }
+
     public static int lastIndexOf(@NonNull CharSequence haystack, @NonNull String needle,
-                                  int start) {
+            int start) {
         int length = haystack.length();
+
         int needleLength = needle.length();
         if (needleLength <= length && start >= 0) {
             if (needleLength > 0) {
@@ -57,6 +65,7 @@ public class CharSequences {
                         return -1;
                     }
                     int o1 = i, o2 = 0;
+
                     //noinspection StatementWithEmptyBody
                     while (++o2 < needleLength && haystack.charAt(++o1) == needle.charAt(o2)) {
                     }
@@ -68,28 +77,35 @@ public class CharSequences {
             }
             return start < length ? start : length;
         }
+
         return -1;
     }
+
     public static int lastIndexOf(@NonNull CharSequence sequence, char c) {
         return lastIndexOf(sequence, c, sequence.length());
     }
+
     public static int lastIndexOf(@NonNull CharSequence sequence, int c, int start) {
         int length = sequence.length();
         if (start >= 0) {
             if (start >= length) {
                 start = length - 1;
             }
+
             for (int i = start; i >= 0; i--) {
                 if (sequence.charAt(i) == c) {
                     return i;
                 }
             }
         }
+
         return -1;
     }
+
     public static int lastIndexOf(@NonNull CharSequence haystack, @NonNull String needle) {
         return lastIndexOf(haystack, needle, haystack.length());
     }
+
     public static boolean regionMatches(
             @NonNull CharSequence sequence,
             int thisStart,
@@ -112,6 +128,7 @@ public class CharSequences {
         }
         return true;
     }
+
     public static boolean regionMatches(
             @NonNull CharSequence sequence,
             boolean ignoreCase,
@@ -138,6 +155,7 @@ public class CharSequences {
         }
         return true;
     }
+
     private static char foldCase(char ch) {
         if (ch < 128) {
             if ('A' <= ch && ch <= 'Z') {
@@ -147,23 +165,28 @@ public class CharSequences {
         }
         return Character.toLowerCase(Character.toUpperCase(ch));
     }
+
     public static boolean startsWith(@NonNull CharSequence sequence, @NonNull CharSequence prefix) {
         return startsWith(sequence, prefix, 0);
     }
+
     public static boolean startsWith(@NonNull CharSequence sequence, @NonNull CharSequence prefix,
-                                     int start) {
+            int start) {
         int sequenceLength = sequence.length();
         int prefixLength = prefix.length();
         if (sequenceLength < start + prefixLength) {
             return false;
         }
+
         for (int i = start, j = 0; j < prefixLength; i++, j++) {
             if (sequence.charAt(i) != prefix.charAt(j)) {
                 return false;
             }
         }
+
         return true;
     }
+
     /**
      * Returns true if the given character sequence ends with the given suffix
      *
@@ -173,12 +196,14 @@ public class CharSequences {
      * @return true if the sequence ends with the given suffix
      */
     public static boolean endsWith(@NonNull CharSequence sequence, @NonNull CharSequence suffix,
-                                   boolean caseSensitive) {
+            boolean caseSensitive) {
         if (suffix.length() > sequence.length()) {
             return false;
         }
+
         int suffixLength = suffix.length();
         int sequenceLength = sequence.length();
+
         for (int i = sequenceLength - suffixLength, j = 0; i < sequenceLength; i++, j++) {
             char c1 = sequence.charAt(i);
             char c2 = suffix.charAt(j);
@@ -190,8 +215,10 @@ public class CharSequences {
                 }
             }
         }
+
         return true;
     }
+
     /**
      * Returns true if the given sequence contains any upper case characters
      *
@@ -206,21 +233,27 @@ public class CharSequences {
                 }
             }
         }
+
         return false;
     }
+
     public static int indexOf(@NonNull CharSequence haystack, @NonNull CharSequence needle) {
         return indexOf(haystack, needle, 0);
     }
+
     public static int indexOf(
             @NonNull CharSequence haystack, @NonNull CharSequence needle, int start) {
         int needleLength = needle.length();
         if (needleLength == 0) {
             return start;
         }
+
         char first = needle.charAt(0);
+
         if (needleLength == 1) {
             return indexOf(haystack, first, start);
         }
+
         search:
         for (int i = start, max = haystack.length() - needleLength; i <= max; i++) {
             if (haystack.charAt(i) == first) {
@@ -232,50 +265,62 @@ public class CharSequences {
                 return i;
             }
         }
+
         return -1;
     }
+
     /** Similar to {@link String#indexOf(int, int)} but with case insensitive comparison. */
     public static int indexOfIgnoreCase(
             @NonNull CharSequence where, @NonNull CharSequence what, int fromIndex) {
         int targetCount = what.length();
         int sourceCount = where.length();
+
         if (fromIndex >= sourceCount) {
             return targetCount == 0 ? sourceCount : -1;
         }
+
         if (fromIndex < 0) {
             fromIndex = 0;
         }
+
         if (targetCount == 0) {
             return fromIndex;
         }
+
         char first = what.charAt(0);
         int max = sourceCount - targetCount;
+
         for (int i = fromIndex; i <= max; i++) {
             /* Look for first character. */
             if (!charsEqualIgnoreCase(where.charAt(i), first)) {
                 //noinspection StatementWithEmptyBody,AssignmentToForLoopParameter
                 while (++i <= max && !charsEqualIgnoreCase(where.charAt(i), first)) {}
             }
+
             /* Found first character, now look at the rest of "what". */
             if (i <= max) {
                 int j = i + 1;
                 int end = j + targetCount - 1;
                 //noinspection StatementWithEmptyBody
                 for (int k = 1;
-                     j < end && charsEqualIgnoreCase(where.charAt(j), what.charAt(k));
-                     j++, k++) {}
+                        j < end && charsEqualIgnoreCase(where.charAt(j), what.charAt(k));
+                        j++, k++) {}
+
                 if (j == end) {
                     /* Found whole string. */
                     return i;
                 }
             }
         }
+
         return -1;
     }
+
     private static boolean charsEqualIgnoreCase(char c1, char c2) {
         // Conversion to upper case alone is not sufficient, for example for Georgian alphabet.
         return toUpperCase(c1) == toUpperCase(c2) || toLowerCase(c1) == toLowerCase(c2);
     }
+
     /**
      * Converts a character to upper case. A slightly optimized version of
      * {@link Character#toUpperCase(char)}.
@@ -285,6 +330,7 @@ public class CharSequences {
         if (c <= 'z') return (char) (c + ('A' - 'a'));
         return Character.toUpperCase(c);
     }
+
     /**
      * Converts a character to lower case. A slightly optimized version of
      * {@link Character#toLowerCase(char)}.
@@ -294,21 +340,26 @@ public class CharSequences {
         if (c <= 'Z') return (char) (c + ('a' - 'A'));
         return Character.toLowerCase(c);
     }
+
     @NonNull
     public static CharSequence createSequence(@NonNull char[] data) {
         return new ArrayBackedCharSequence(data);
     }
+
     @NonNull
     public static CharSequence createSequence(@NonNull char[] data, int offset, int length) {
         return new ArrayBackedCharSequence(data, offset, length);
     }
+
     @NonNull
     public static char[] getCharArray(@NonNull CharSequence sequence) {
         if (sequence instanceof ArrayBackedCharSequence) {
             return ((ArrayBackedCharSequence)sequence).getCharArray();
         }
+
         return sequence.toString().toCharArray();
     }
+
     /**
      * The {@link CharSequenceReader} returned by this method is intended for single-thread use
      * only.
@@ -328,8 +379,10 @@ public class CharSequences {
                 reader.read();
             }
         }
+
         return reader;
     }
+
     @Nullable
     public static Document parseDocumentSilently(@NonNull CharSequence xml, boolean namespaceAware) {
         try {
@@ -338,12 +391,15 @@ public class CharSequences {
         } catch (SAXException | IOException e) {
             // This method is deliberately silent; will return null.
         }
+
         return null;
     }
+
     @NonNull
     public static InputStream getInputStream(@NonNull CharSequence text) {
         return new ByteArrayInputStream(text.toString().getBytes(Charsets.UTF_8));
     }
+
     /**
      * A {@link CharSequence} intended for use by lint; it is a char[]-backed
      * {@linkplain CharSequence} which can provide its backing array to lint
@@ -356,14 +412,17 @@ public class CharSequences {
         public final char[] data;
         private final int offset;
         private final int length;
+
         public ArrayBackedCharSequence(@NonNull char[] data) {
             this(data, 0, data.length);
         }
+
         public ArrayBackedCharSequence(@NonNull char[] data, int offset, int length) {
             this.data = data;
             this.offset = offset;
             this.length = length;
         }
+
         @NonNull
         public char[] getCharArray() {
             if (offset == 0 && length == data.length) {
@@ -372,18 +431,22 @@ public class CharSequences {
                 return Arrays.copyOfRange(data, offset, offset + length);
             }
         }
+
         @Override
         public int length() {
             return length;
         }
+
         @Override
         public char charAt(int index) {
             return data[offset + index];
         }
+
         @Override
         public CharSequence subSequence(int start, int end) {
             return new ArrayBackedCharSequence(data, offset + start, end - start);
         }
+
         @NonNull
         @Override
         public String toString() {

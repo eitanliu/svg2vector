@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 package com.android.utils;
+
 import com.android.annotations.NonNull;
 import java.text.DecimalFormatSymbols;
+
 /** Static methods for dealing with floating point numbers in string decimal form. */
 public class DecimalUtils {
     /**
@@ -30,6 +32,7 @@ public class DecimalUtils {
     public static String trimInsignificantZeros(@NonNull String floatingPointNumber) {
         return trimInsignificantZeros(floatingPointNumber, '.', "E");
     }
+
     /**
      * Removes trailing zeros after the decimal separator and also the decimal separator itself if
      * there are no non-zero digits after it.
@@ -43,6 +46,7 @@ public class DecimalUtils {
         return trimInsignificantZeros(
                 floatingPointNumber, symbols.getDecimalSeparator(), symbols.getExponentSeparator());
     }
+
     /**
      * Removes trailing zeros after the decimal separator and also the decimal separator itself if
      * there are no non-zero digits after it.
@@ -63,6 +67,7 @@ public class DecimalUtils {
         if (pos == 0) {
             pos = 2;
         }
+
         int exponent =
                 CharSequences.indexOfIgnoreCase(floatingPointNumber, exponentialSeparator, pos);
         int i = exponent >= 0 ? exponent : floatingPointNumber.length();
@@ -80,6 +85,7 @@ public class DecimalUtils {
             return floatingPointNumber.substring(0, i) + floatingPointNumber.substring(exponent);
         }
     }
+
     /** Do not instantiate. All methods are static. */
     private DecimalUtils() {}
 }

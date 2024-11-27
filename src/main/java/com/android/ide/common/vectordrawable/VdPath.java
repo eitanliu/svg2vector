@@ -625,7 +625,15 @@ class VdPath extends VdElement {
             gradientNode = gradientNode.getNextSibling();
             if (gradientNode != null) {
                 // This should also be guaranteed given the way we write the VD XMLs.
-                String attrValue = gradientNode.getAttributes().getNamedItem("name").getNodeValue();
+                org.w3c.dom.Node aaptAttrNode = gradientNode.getAttributes().getNamedItem("name");
+                if (aaptAttrNode == null) {
+                    throw new IllegalStateException(
+                            "gradient resource not declared as an inline resource in the vector drawable.\n" +
+                            "Recommended Action: Surround the gradient tag with " +
+                            "<aapt:attr name=[attribute, such as \"android:fillcolor\"]> </aapt:attr>\n"+
+                    "More Information: https://developer.android.com/guide/topics/resources/complex-xml-resources");
+                }
+                String attrValue = aaptAttrNode.getNodeValue();
                 if (attrValue.equals("android:fillColor")) {
                     fillGradient = newGradient;
                 } else if (attrValue.equals("android:strokeColor")) {

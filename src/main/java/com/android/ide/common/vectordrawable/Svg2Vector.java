@@ -17,18 +17,27 @@ package com.android.ide.common.vectordrawable;
 
 import static com.android.ide.common.vectordrawable.SvgTree.getStartLine;
 
-import com.android.ConfigConstant;
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
+import com.android.annotations.concurrency.Slow;
 import com.android.utils.Pair;
-import com.android.utils.XmlUtils;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import java.io.ByteArrayOutputStream;
+
+import org.jetbrains.annotations.NotNull;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -37,11 +46,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * Converts SVG to VectorDrawable's XML.
@@ -264,13 +268,92 @@ public class Svg2Vector {
     // Fills in all <use> nodes in the svgTree.
     private static void resolveUseNodes(SvgTree svgTree) {
         Set<SvgGroupNode> nodes = svgTree.getPendingUseSet();
+        Set<SvgGroupNode> pendingUseSet = new HashSet<>(nodes);
         while (!nodes.isEmpty()) {
             if (!nodes.removeIf(node -> node.resolveHref(svgTree))) {
                 // Not able to make progress because of cyclic references.
                 reportCycles(svgTree, nodes);
-                break;
+                return;
             }
         }
+
+        List<SvgGroupNode> ordering = getUseNodeTopologicalOrdering(svgTree, pendingUseSet);
+        ordering.forEach(SvgGroupNode::handleUse);
+    }
+
+    /**
+     * This orders the 'use' nodes in pendingUseSet in a topological order, in the sense that an
+     * earlier node does not reference a part of the svgTree that contains a later node.
+     */
+    @NotNull
+    private static List<SvgGroupNode> getUseNodeTopologicalOrdering(
+            SvgTree svgTree, Set<SvgGroupNode> pendingUseSet) {
+        Deque<SvgNode> queue = new ArrayDeque<>();
+        // Directed graph where nodes of the svgTree point to their parent and 'use' nodes that
+        // reference them.
+        Map<SvgNode, Set<SvgNode>> reverseGraph = new HashMap<>();
+        Map<SvgNode, Integer> inDegrees = new HashMap<>();
+        SvgGroupNode root = svgTree.getRoot();
+        queue.add(root);
+        reverseGraph.put(root, new HashSet<>());
+        inDegrees.put(root, 0);
+        while (!queue.isEmpty()) {
+            SvgNode current = queue.removeFirst();
+            if (current instanceof SvgGroupNode) {
+                SvgGroupNode groupNode = (SvgGroupNode) current;
+                for (SvgNode child : groupNode.mChildren) {
+                    reverseGraph.putIfAbsent(child, new HashSet<>());
+                    reverseGraph.get(child).add(current);
+                    if (!inDegrees.containsKey(child)) {
+                        queue.addLast(child);
+                        inDegrees.put(child, 0);
+                    }
+                }
+                SvgNode useRefNode = groupNode.mUseReferenceNode;
+                if (useRefNode != null) {
+                    reverseGraph.putIfAbsent(useRefNode, new HashSet<>());
+                    reverseGraph.get(useRefNode).add(current);
+                    if (!inDegrees.containsKey(useRefNode)) {
+                        queue.addLast(useRefNode);
+                        inDegrees.put(useRefNode, 0);
+                    }
+                }
+            }
+        }
+
+        for (SvgNode node : reverseGraph.keySet()) {
+            for (SvgNode child : reverseGraph.get(node)) {
+                inDegrees.put(child, inDegrees.get(child) + 1);
+            }
+        }
+
+        for (SvgNode node : inDegrees.keySet()) {
+            if (inDegrees.get(node) == 0) {
+                queue.add(node);
+            }
+        }
+
+        List<SvgGroupNode> topologicalOrdering = new ArrayList<>();
+        while (!queue.isEmpty()) {
+            SvgNode current = queue.removeFirst();
+            if (current instanceof SvgGroupNode) {
+                SvgGroupNode groupNode = (SvgGroupNode) current;
+                if (groupNode.mUseReferenceNode != null) {
+                    topologicalOrdering.add(groupNode);
+                    pendingUseSet.remove(groupNode);
+                }
+            }
+            for (SvgNode child : reverseGraph.get(current)) {
+                inDegrees.put(child, inDegrees.get(child) - 1);
+                if (inDegrees.get(child) == 0) {
+                    queue.add(child);
+                }
+            }
+        }
+
+        // Add remaining nodes for which the order is irrelevant
+        topologicalOrdering.addAll(pendingUseSet);
+        return topologicalOrdering;
     }
 
     // Resolves all href references in gradient nodes.
@@ -1182,20 +1265,6 @@ public class Svg2Vector {
 
     private static void writeFile(@NonNull OutputStream outStream, @NonNull SvgTree svgTree)
             throws IOException {
-        ByteArrayOutputStream tempStream = new ByteArrayOutputStream();
-        svgTree.writeXml(tempStream);
-        if (ConfigConstant.overrideInfo != null) {
-            try {
-                Document doc = XmlUtils.parseDocument(tempStream.toString(), true);
-                String out = VdPreview.overrideXmlContent(doc, ConfigConstant.overrideInfo, null);
-                if (out != null) {
-                    outStream.write(out.getBytes());
-                    return;
-                }
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
-        }
         svgTree.writeXml(outStream);
     }
 
@@ -1208,6 +1277,7 @@ public class Svg2Vector {
      * @return the error message that combines all logged errors and warnings, or an empty string if
      *     there were no errors
      */
+    @Slow
     @NonNull
     public static String parseSvgToXml(@NonNull Path inputSvg, @NonNull OutputStream outStream)
             throws IOException {

@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 package com.android.utils;
+
 import static com.android.SdkConstants.UTF_8;
 import static com.android.utils.XmlUtils.CDATA_PREFIX;
+
 import com.android.ProgressManagerAdapter;
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
@@ -50,6 +52,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.ext.DefaultHandler2;
 import org.xml.sax.helpers.DefaultHandler;
+
 /**
  * A simple DOM XML parser which can retrieve exact beginning and end offsets
  * (and line and column numbers) for element nodes as well as attribute nodes.
@@ -62,9 +65,11 @@ public class PositionXmlParser {
     private static final int CDATA_PREFIX_LENGTH = CDATA_PREFIX.length();
     /** See <a href="http://www.w3.org/TR/REC-xml/#NT-EncodingDecl">...</a> */
     private static final Pattern ENCODING_PATTERN = Pattern.compile("encoding=['\"](\\S*)['\"]");
+
     private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY;
     private static final SAXParserFactory SAX_PARSER_FACTORY;
     private static final SAXParserFactory NAMESPACE_AWARE_SAX_PARSER_FACTORY;
+
     static {
         DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
         DOCUMENT_BUILDER_FACTORY.setNamespaceAware(true);
@@ -74,6 +79,7 @@ public class PositionXmlParser {
         NAMESPACE_AWARE_SAX_PARSER_FACTORY = SAXParserFactory.newInstance();
         XmlUtils.configureSaxFactory(NAMESPACE_AWARE_SAX_PARSER_FACTORY, true, false);
     }
+
     /**
      * Parses the XML content from the given input stream and closes the stream.
      *
@@ -90,12 +96,14 @@ public class PositionXmlParser {
             throws ParserConfigurationException, SAXException, IOException {
         return parse(readAllBytes(input), namespaceAware, DOCUMENT_BUILDER_FACTORY);
     }
+
     @NonNull
     public static Document parse(
             @NonNull InputStream input, boolean namespaceAware, DocumentBuilderFactory factory)
             throws ParserConfigurationException, SAXException, IOException {
         return parse(readAllBytes(input), namespaceAware, factory);
     }
+
     /**
      * Parses the XML content from the given input stream and closes the stream.
      *
@@ -117,6 +125,7 @@ public class PositionXmlParser {
             throws ParserConfigurationException, IOException {
         return parse(readAllBytes(input), namespaceAware, parseErrors);
     }
+
     /**
      * @see #parse(InputStream, boolean)
      */
@@ -125,6 +134,7 @@ public class PositionXmlParser {
             throws IOException, SAXException, ParserConfigurationException {
         return parse(input, true);
     }
+
     /** @see #parse(InputStream, boolean) */
     @NonNull
     public static Document parse(
@@ -132,12 +142,14 @@ public class PositionXmlParser {
             throws IOException, SAXException, ParserConfigurationException {
         return parse(input, true, factory);
     }
+
     /** @see #parse(byte[], boolean, DocumentBuilderFactory) */
     @NonNull
     public static Document parse(@NonNull byte[] data)
             throws ParserConfigurationException, SAXException, IOException {
         return parse(data, true, DOCUMENT_BUILDER_FACTORY);
     }
+
     /**
      * @see #parse(String, boolean)
      */
@@ -146,6 +158,7 @@ public class PositionXmlParser {
             throws ParserConfigurationException, SAXException, IOException {
         return parse(xml, true);
     }
+
     /**
      * Parses the XML content from the given byte array.
      *
@@ -165,6 +178,7 @@ public class PositionXmlParser {
         xml = XmlUtils.stripBom(xml);
         return parseInternal(xml, namespaceAware, factory);
     }
+
     /**
      * Parses the XML content from the given byte array.
      *
@@ -188,6 +202,7 @@ public class PositionXmlParser {
         xml = XmlUtils.stripBom(xml);
         return parseInternal(xml, namespaceAware, parseErrors);
     }
+
     /**
      * Parses the given XML content.
      *
@@ -205,6 +220,7 @@ public class PositionXmlParser {
         xml = XmlUtils.stripBom(xml);
         return parseInternal(xml, namespaceAware, DOCUMENT_BUILDER_FACTORY);
     }
+
     @NonNull
     private static Document parseInternal(
             @NonNull String xml, boolean namespaceAware, @NonNull DocumentBuilderFactory factory)
@@ -229,6 +245,7 @@ public class PositionXmlParser {
         }
         return domBuilder.getDocument();
     }
+
     @NonNull
     private static Document parseInternal(
             @NonNull String xml, boolean namespaceAware, @NonNull List<String> parseErrors)
@@ -255,6 +272,7 @@ public class PositionXmlParser {
         }
         return domBuilder.getDocument();
     }
+
     private static void parseInternal(
             @NonNull String xml, boolean namespaceAware, @NonNull DefaultHandler handler)
             throws ParserConfigurationException, IOException, SAXException {
@@ -265,6 +283,7 @@ public class PositionXmlParser {
         xmlReader.setProperty("http://xml.org/sax/properties/lexical-handler", handler);
         parser.parse(createSource(xml), handler);
     }
+
     /**
      * Reads all bytes from the given stream and closes it.
      *
@@ -286,9 +305,11 @@ public class PositionXmlParser {
         }
         return out.toByteArray();
     }
+
     private static InputSource createSource(@NonNull String xml) {
         return new InputSource(new StringReader(xml));
     }
+
     /**
      * Returns the String corresponding to the given byte array of XML data
      * (with unknown encoding). This method attempts to guess the encoding based
@@ -301,6 +322,7 @@ public class PositionXmlParser {
     public static String getXmlString(@NonNull byte[] data) {
         return getXmlString(data, UTF_8);
     }
+
     /**
      * Returns the String corresponding to the given byte array of XML data
      * (with unknown encoding). This method attempts to guess the encoding based
@@ -313,6 +335,7 @@ public class PositionXmlParser {
     @NonNull
     public static String getXmlString(@NonNull byte[] data, @NonNull String defaultCharset) {
         int offset = 0;
+
         String charset = null;
         // Look for the byte order mark, to see if we need to remove bytes from
         // the input stream (and to determine whether files are big endian or little endian) etc
@@ -345,6 +368,7 @@ public class PositionXmlParser {
             }
         }
         int length = data.length - offset;
+
         // Guess encoding by searching for an encoding= entry in the first line.
         // The prologue, and the encoding names, will always be in ASCII - which means
         // we don't need to worry about strange character encodings for the prologue characters.
@@ -376,11 +400,12 @@ public class PositionXmlParser {
                             && (data[i + 2] == 'f' || data[i + 2] == 'F')
                             && (data[i + 3] == '-' || data[i + 3] == '_')
                             && (data[i + 4] == '8')
-                    ) {
+                            ) {
                         charset = UTF_8;
                         break;
                     }
                 }
+
                 if (charset == null) {
                     StringBuilder sb = new StringBuilder();
                     for (int i = prologueStart; i <= lineEnd; i++) {
@@ -397,13 +422,16 @@ public class PositionXmlParser {
                         }
                     }
                 }
+
                 break;
             }
         }
+
         // No prologue on the first line, and no byte order mark: Assume UTF-8/16.
         if (charset == null) {
             charset = seenOddZero ? UTF_16LE : seenEvenZero ? UTF_16 : defaultCharset;
         }
+
         String xml = null;
         try {
             xml = new String(data, offset, length, charset);
@@ -421,6 +449,7 @@ public class PositionXmlParser {
         }
         return xml;
     }
+
     /**
      * Returns the position for the given node. This is the start position. The end position can be
      * obtained via {@link Position#getEnd()}.
@@ -432,6 +461,7 @@ public class PositionXmlParser {
     public static SourcePosition getPosition(@NonNull Node node) {
         return getPosition(node, -1, -1);
     }
+
     /**
      * Returns the position for the given node. This is the start position. The end position can be
      * obtained via {@link Position#getEnd()}. A specific range within the node can be specified
@@ -450,6 +480,7 @@ public class PositionXmlParser {
         Position p = getPositionHelper(node, start, end);
         return p == null ? SourcePosition.UNKNOWN : p.toSourcePosition();
     }
+
     /**
      * Finds the leaf node at the given offset.
      *
@@ -467,8 +498,10 @@ public class PositionXmlParser {
         } else {
             return findNodeAtOffset(node, offset);
         }
+
         return null;
     }
+
     @Nullable
     private static Node findNodeAtOffset(@NonNull Node node, int offset) {
         Position p = getPositionHelper(node, -1, -1);
@@ -485,6 +518,7 @@ public class PositionXmlParser {
         } else {
             return null;
         }
+
         NodeList children = node.getChildNodes();
         for (int i = 0, n = children.getLength(); i < n; i++) {
             Node item = children.item(i);
@@ -493,6 +527,7 @@ public class PositionXmlParser {
                 return match;
             }
         }
+
         NamedNodeMap attributes = node.getAttributes();
         if (attributes != null) {
             for (int i = 0, n = attributes.getLength(); i < n; i++) {
@@ -503,8 +538,10 @@ public class PositionXmlParser {
                 }
             }
         }
+
         return node;
     }
+
     /**
      * Finds the leaf node at the given offset.
      *
@@ -519,8 +556,10 @@ public class PositionXmlParser {
         if (root != null) {
             return findNodeAtLineAndCol(root, line, column);
         }
+
         return null;
     }
+
     @Nullable
     private static Node findNodeAtLineAndCol(@NonNull Node node, int line, int column) {
         Position p = getPositionHelper(node, -1, -1);
@@ -539,6 +578,7 @@ public class PositionXmlParser {
         } else {
             return null;
         }
+
         NodeList children = node.getChildNodes();
         for (int i = 0, n = children.getLength(); i < n; i++) {
             Node item = children.item(i);
@@ -547,6 +587,7 @@ public class PositionXmlParser {
                 return match;
             }
         }
+
         NamedNodeMap attributes = node.getAttributes();
         if (attributes != null) {
             for (int i = 0, n = attributes.getLength(); i < n; i++) {
@@ -557,8 +598,10 @@ public class PositionXmlParser {
                 }
             }
         }
+
         return node;
     }
+
     @Nullable
     private static Position getPositionHelper(@NonNull Node node, int start, int end) {
         // Look up the position information stored while parsing for the given node.
@@ -582,16 +625,19 @@ public class PositionXmlParser {
                         endOffset = startOffset + (end - start);
                     }
                 }
+
                 // Find attribute in the text.
                 String contents = (String) node.getOwnerDocument().getUserData(CONTENT_KEY);
                 if (contents == null) {
                     return null;
                 }
+
                 // Locate the name=value attribute in the source text.
                 // Fast string check first for the common occurrence.
                 String name = attr.getName();
                 int nameLength = name.length();
                 int curr = startOffset;
+
                 // Skip out of element name token
                 while (curr < endOffset) {
                     char c = contents.charAt(curr);
@@ -600,12 +646,14 @@ public class PositionXmlParser {
                     }
                     curr++;
                 }
+
                 while (curr < endOffset) {
                     // Look for the attribute name (and make sure we don't find it inside an
                     // attribute value)
                     while (curr < endOffset && Character.isWhitespace(contents.charAt(curr))) {
                         curr++;
                     }
+
                     // No more attributes?
                     if (curr == endOffset) {
                         break;
@@ -624,15 +672,16 @@ public class PositionXmlParser {
                         }
                         curr++;
                     }
+
                     if (attributeEnd != -1) {
                         attributeEnd++;
                         boolean match =
                                 contents.regionMatches(attributeStart, name, 0, nameLength)
                                         && (Character.isWhitespace(
-                                        contents.charAt(
-                                                attributeStart + nameLength))
-                                        || contents.charAt(attributeStart + nameLength)
-                                        == '=');
+                                                        contents.charAt(
+                                                                attributeStart + nameLength))
+                                                || contents.charAt(attributeStart + nameLength)
+                                                        == '=');
                         if (match) {
                             // Adjust the line and column to this new offset.
                             int line = pos.getLine();
@@ -646,6 +695,7 @@ public class PositionXmlParser {
                                     column++;
                                 }
                             }
+
                             Position attributePosition = new Position(line, column, attributeStart);
                             // Also set end range for retrieval in getLocation.
                             int attributeColumnEnd = column + attributeEnd - attributeStart;
@@ -658,6 +708,7 @@ public class PositionXmlParser {
                         break;
                     }
                 }
+
                 // Attribute not found: just fall back to element position.
                 return pos;
             }
@@ -676,19 +727,23 @@ public class PositionXmlParser {
                 int endOffset = pos.getEnd().getOffset();
                 int line = pos.getLine();
                 int column = pos.getColumn();
+
                 // Find attribute in the text.
                 String contents = (String) node.getOwnerDocument().getUserData(CONTENT_KEY);
                 if (contents == null || contents.length() < endOffset) {
                     return null;
                 }
+
                 boolean inAttribute = false;
                 for (int offset = startOffset; offset <= endOffset; offset++) {
                     char c = contents.charAt(offset);
                     if (c == '>' && !inAttribute) {
                         // Found the end of the element open tag: this is where the text begins.
+
                         // Skip >
                         offset++;
                         column++;
+
                         if (node instanceof CDATASection) {
                             c = contents.charAt(offset);
                             while (Character.isWhitespace(c) || c == '\n') {
@@ -699,11 +754,13 @@ public class PositionXmlParser {
                                 offset++;
                                 c = contents.charAt(offset);
                             }
+
                             if (contents.regionMatches(offset, CDATA_PREFIX, 0, CDATA_PREFIX_LENGTH)) {
                                 offset += CDATA_PREFIX_LENGTH;
                                 column += CDATA_PREFIX_LENGTH;
                             }
                         }
+
                         String text = node.getNodeValue();
                         int textIndex = 0;
                         int textLength = text.length();
@@ -741,6 +798,7 @@ public class PositionXmlParser {
                             line = newLine;
                             column = newColumn;
                         }
+
                         Position attributePosition = new Position(line, column, offset + textIndex);
                         // Also set end range for retrieval in getLocation
                         if (end != -1) {
@@ -753,6 +811,7 @@ public class PositionXmlParser {
                                     break;
                                 }
                             }
+
                             // Search for the end
                             endOffset = offset + textIndex;
                             int endLine = line;
@@ -767,6 +826,7 @@ public class PositionXmlParser {
                                 }
                                 endOffset++;
                             }
+
                             attributePosition.setEnd(
                                     new Position(endLine, endColumn, endOffset));
                         }
@@ -779,11 +839,14 @@ public class PositionXmlParser {
                     }
                     column++;
                 }
+
                 return pos;
             }
         }
+
         return (Position) node.getUserData(POS_KEY);
     }
+
     /**
      * SAX parser handler which incrementally builds up a DOM document as we go
      * along, and updates position information along the way. Position
@@ -801,35 +864,43 @@ public class PositionXmlParser {
         private boolean mCdata;
         @SuppressWarnings("StringBufferField")
         private final StringBuilder mPendingText = new StringBuilder();
+
         DomBuilder(String xml, DocumentBuilderFactory factory) throws ParserConfigurationException {
             mXml = xml;
+
             DocumentBuilder docBuilder = factory.newDocumentBuilder();
             mDocument = docBuilder.newDocument();
             mDocument.setUserData(CONTENT_KEY, xml, null);
         }
+
         /** Returns the document parsed by the handler. */
         @NonNull
         Document getDocument() {
             closeUnfinishedElements();
             return mDocument;
         }
+
         void closeUnfinishedElements() {
             flushText();
             while (!mStack.isEmpty()) {
                 Element element = mStack.remove(mStack.size() - 1);
+
                 Position pos = (Position) element.getUserData(POS_KEY);
                 assert pos != null;
                 pos.setEnd(getCurrentPosition());
+
                 addNodeToParent(element);
             }
         }
+
         @Override
         public void setDocumentLocator(Locator locator) {
             this.mLocator = locator;
         }
+
         @Override
         public void startElement(String uri, String localName, String qName,
-                                 Attributes attributes) throws SAXException {
+                Attributes attributes) throws SAXException {
             try {
                 flushText();
                 Element element = mDocument.createElementNS(uri, qName);
@@ -847,7 +918,9 @@ public class PositionXmlParser {
                         assert attr.getOwnerElement() == element;
                     }
                 }
+
                 Position pos = getCurrentPosition();
+
                 // The starting position reported to us by SAX is really the END of the
                 // open tag in an element, when all the attributes have been processed.
                 // We have to scan backwards to find the real beginning. We'll do that
@@ -862,27 +935,34 @@ public class PositionXmlParser {
                 throw new SAXException(t);
             }
         }
+
         @Override
         public void endElement(String uri, String localName, String qName) {
             flushText();
             Element element = mStack.remove(mStack.size() - 1);
+
             Position pos = (Position) element.getUserData(POS_KEY);
             assert pos != null;
             pos.setEnd(getCurrentPosition());
+
             addNodeToParent(element);
         }
+
         @Override
         public void comment(char[] chars, int start, int length) throws SAXException {
             flushText();
             String comment = new String(chars, start, length);
             Comment domComment = mDocument.createComment(comment);
+
             // current position is the closing comment tag.
             Position currentPosition = getCurrentPosition();
             Position startPosition = findOpeningTag(currentPosition);
             startPosition.setEnd(currentPosition);
+
             domComment.setUserData(POS_KEY, startPosition, null);
             addNodeToParent(domComment);
         }
+
         /**
          * Adds a node to the current parent element being visited, or to the document if there is
          * no parent in context.
@@ -897,6 +977,7 @@ public class PositionXmlParser {
                 parent.appendChild(nodeToAdd);
             }
         }
+
         /**
          * Find opening tags from the current position.
          * '<' cannot appear in attribute values or anywhere else within
@@ -911,6 +992,7 @@ public class PositionXmlParser {
         private Position findOpeningTag(Position startingPosition) {
             for (int offset = startingPosition.getOffset() - 1; offset >= 0; offset--) {
                 char c = mXml.charAt(offset);
+
                 if (c == '<') {
                     // Adjust line position
                     int line = startingPosition.getLine();
@@ -919,6 +1001,7 @@ public class PositionXmlParser {
                             line--;
                         }
                     }
+
                     // Compute new column position
                     int column = 0;
                     for (int i = offset - 1; i >= 0; i--, column++) {
@@ -926,12 +1009,14 @@ public class PositionXmlParser {
                             break;
                         }
                     }
+
                     return new Position(line, column, offset);
                 }
             }
             // we did not find it, approximate.
             return startingPosition;
         }
+
         /**
          * Returns a position holder for the current position. The most
          * important part of this function is to incrementally compute the
@@ -942,6 +1027,7 @@ public class PositionXmlParser {
         private Position getCurrentPosition() {
             int line = mLocator.getLineNumber() - 1;
             int column = mLocator.getColumnNumber() - 1;
+
             // Compute offset incrementally now that we have the new line and column numbers.
             int xmlLength = mXml.length();
             while (mCurrentLine < line && mCurrentOffset < xmlLength) {
@@ -959,6 +1045,7 @@ public class PositionXmlParser {
                 }
                 mCurrentOffset++;
             }
+
             // Validity check -- the parser will sometimes pass newlines with columns that are
             // out of bounds for the line; check for this
             // (https://issuetracker.google.com/123835101)
@@ -975,28 +1062,34 @@ public class PositionXmlParser {
                 }
                 mCurrentOffset++;
             }
+
             if (mCurrentOffset >= xmlLength) {
                 // The parser sometimes passes wrong column numbers at the
                 // end of the file: Ensure that the offset remains valid.
                 mCurrentOffset = xmlLength;
             }
             mCurrentColumn = column;
+
             return new Position(mCurrentLine, mCurrentColumn, mCurrentOffset);
         }
+
         @Override
         public void startCDATA() {
             flushText();
             mCdata = true;
         }
+
         @Override
         public void endCDATA() {
             flushText();
             mCdata = false;
         }
+
         @Override
         public void characters(char[] c, int start, int length) throws SAXException {
             mPendingText.append(c, start, length);
         }
+
         private void flushText() {
             if ((mPendingText.length() > 0 || mCdata) && !mStack.isEmpty()) {
                 Element element = mStack.get(mStack.size() - 1);
@@ -1011,12 +1104,14 @@ public class PositionXmlParser {
             }
         }
     }
+
     private static class Position {
         /** The line number (0-based where the first line is line 0). */
         private final int mLine;
         private final int mColumn;
         private final int mOffset;
         private Position mEnd;
+
         /**
          * Creates a new position.
          *
@@ -1029,30 +1124,39 @@ public class PositionXmlParser {
             this.mColumn = column;
             this.mOffset = offset;
         }
+
         public int getLine() {
             return mLine;
         }
+
         public int getOffset() {
             return mOffset;
         }
+
         public int getColumn() {
             return mColumn;
         }
+
         public Position getEnd() {
             return mEnd;
         }
+
         public void setEnd(@NonNull Position end) {
             mEnd = end;
         }
+
         public SourcePosition toSourcePosition() {
-            int endLine = mLine, endColumn = mColumn, endOffset = mOffset;
+           int endLine = mLine, endColumn = mColumn, endOffset = mOffset;
+
             if (mEnd != null) {
                 endLine = mEnd.getLine();
                 endColumn = mEnd.getColumn();
                 endOffset = mEnd.getOffset();
             }
+
             return new SourcePosition(mLine, mColumn, mOffset, endLine, endColumn, endOffset);
         }
     }
+
     private PositionXmlParser() { }
 }

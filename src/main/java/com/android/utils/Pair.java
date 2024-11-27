@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.android.utils;
+
 /**
  * A Pair class is simply a 2-tuple for use in this package. We might want to
  * think about adding something like this to a more central utility place, or
@@ -28,11 +30,13 @@ package com.android.utils;
 public final class Pair<S,T> {
     private final S mFirst;
     private final T mSecond;
+
     // Use {@link Pair#of} factory instead since it infers generic types
     private Pair(S first, T second) {
         this.mFirst = first;
         this.mSecond = second;
     }
+
     /**
      * Return the first item in the pair
      *
@@ -41,6 +45,7 @@ public final class Pair<S,T> {
     public S getFirst() {
         return mFirst;
     }
+
     /**
      * Return the second item in the pair
      *
@@ -49,6 +54,7 @@ public final class Pair<S,T> {
     public T getSecond() {
         return mSecond;
     }
+
     /**
      * Constructs a new pair of the given two objects, inferring generic types.
      *
@@ -61,10 +67,12 @@ public final class Pair<S,T> {
     public static <S,T> Pair<S,T> of(S first, T second) {
         return new Pair<S,T>(first,second);
     }
+
     @Override
     public String toString() {
         return "Pair [first=" + mFirst + ", second=" + mSecond + "]";
     }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -73,6 +81,7 @@ public final class Pair<S,T> {
         result = prime * result + ((mSecond == null) ? 0 : mSecond.hashCode());
         return result;
     }
+
     @SuppressWarnings("unchecked")
     @Override
     public boolean equals(Object obj) {
