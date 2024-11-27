@@ -28,7 +28,7 @@ object Command {
             addOption("f", "file", true, "the target svg file")
             addOption("o", "output", true, "the output vector file or directory")
             addOption("w", "width", true, "the width needs to be overridden.")
-            addOption("h", "height", true, "the width needs to be overridden. ")
+            addOption("h", "height", true, "the height needs to be overridden. ")
             addOption("a", "alpha", true, "the alpha needs to be overridden. (0.0 ~ 1.0)")
             addOption("t", "tint", true, "the RGB value of the tint. (000000 ~ ffffff)")
             addOption("m", "autoMirrored", true, "auto mirroring for RTL layout (default ture)")

@@ -25,7 +25,7 @@ svg2vector.bat -d .\input_dir -o .\output_dir
  -f,--file <arg>           the target svg file
  -o,--output <arg>         the output vector file or directory
  -w,--width <arg>          the width needs to be overridden.
- -h,--height <arg>         the width needs to be overridden.
+ -h,--height <arg>         the height needs to be overridden.
  -a,--alpha <arg>          the alpha needs to be overridden. (0.0 ~ 1.0)
  -t,--tint <arg>           the RGB value of the tint. (000000 ~ ffffff)
  -m,--autoMirrored <arg>   auto mirroring for RTL layout (default ture)
