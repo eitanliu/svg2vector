@@ -19,7 +19,10 @@ import java.util.zip.GZIPInputStream
 object Command {
     private const val HELPER_INFO = "-f d:/svg/a.svg -o d:/vector/a.xml"
 
-    val noOverrideInfo = VdOverrideInfo(0.0, 0.0, null, -1.0, false)
+    val noOverrideInfo = VdOverrideInfo(
+        0.0, 0.0, null, -1.0,
+        ConfigConstant.autoMirrored,
+    )
 
     @JvmStatic
     fun parse(args: Array<String>) {
@@ -187,7 +190,6 @@ object Command {
                         }
                     } catch (e: Throwable) {
                         out.write(tempStream.toByteArray())
-                        e.printStackTrace()
                     }
                 } else {
                     out.write(tempStream.toByteArray())

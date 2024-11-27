@@ -21,6 +21,7 @@ import static com.android.utils.DecimalUtils.trimInsignificantZeros;
 import static com.android.utils.PositionXmlParser.getPosition;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import com.android.ConfigConstant;
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
 import com.android.utils.Pair;
@@ -493,6 +494,17 @@ class SvgTree {
             writer.write(System.lineSeparator());
         }
 
+        boolean autoMirrored = ConfigConstant.autoMirrored;
+        if(ConfigConstant.overrideInfo != null) {
+            autoMirrored = ConfigConstant.overrideInfo.getAutoMirrored();
+        }
+        if (autoMirrored) {
+            writer.write(CONTINUATION_INDENT);
+            writer.write("android:autoMirrored=\"");
+            writer.write(String.valueOf(autoMirrored));
+            writer.write("\"");
+            writer.write(System.lineSeparator());
+        }
         writer.write(CONTINUATION_INDENT);
         writer.write("android:width=\"");
         writer.write(formatCoordinate(getWidth() * getScaleFactor()));
