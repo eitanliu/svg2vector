@@ -18,14 +18,16 @@ package com.android.utils;
 
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
-import com.google.common.base.Charsets;
+
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 /**
  * A number of utility methods around {@link CharSequence} handling, which adds methods that are
@@ -397,7 +399,7 @@ public class CharSequences {
 
     @NonNull
     public static InputStream getInputStream(@NonNull CharSequence text) {
-        return new ByteArrayInputStream(text.toString().getBytes(Charsets.UTF_8));
+        return new ByteArrayInputStream(text.toString().getBytes(StandardCharsets.UTF_8));
     }
 
     /**

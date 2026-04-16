@@ -389,8 +389,13 @@ class SvgGradientNode extends SvgNode {
                 logWarning("Unsupported opacity value");
                 opacity = 1;
             }
-            int color1 = VdPath.applyAlpha(parseColorValue(color), opacity);
-            color = String.format("#%08X", color1);
+            int color1;
+            try {
+                color1 = VdPath.applyAlpha(parseColorValue(color), opacity);
+                color = String.format("#%08X", color1);
+            } catch (IllegalArgumentException e) {
+                logWarning("Unsupported color value " + color);
+            }
 
             writer.write(indent);
             writer.write("<item android:offset=\"");

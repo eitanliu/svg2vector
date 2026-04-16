@@ -22,20 +22,9 @@ import com.android.ProgressManagerAdapter;
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
 import com.android.ide.common.blame.SourcePosition;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
+
+import com.google.common.collect.Queues;
+
 import org.w3c.dom.Attr;
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.Comment;
@@ -53,6 +42,25 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.ext.DefaultHandler2;
 import org.xml.sax.helpers.DefaultHandler;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
 /**
  * A simple DOM XML parser which can retrieve exact beginning and end offsets
  * (and line and column numbers) for element nodes as well as attribute nodes.
@@ -66,18 +74,145 @@ public class PositionXmlParser {
     /** See <a href="http://www.w3.org/TR/REC-xml/#NT-EncodingDecl">...</a> */
     private static final Pattern ENCODING_PATTERN = Pattern.compile("encoding=['\"](\\S*)['\"]");
 
-    private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY;
-    private static final SAXParserFactory SAX_PARSER_FACTORY;
-    private static final SAXParserFactory NAMESPACE_AWARE_SAX_PARSER_FACTORY;
+    private static final ParserPool<DocumentBuilder> DOM_BUILDER_POOL;
+    private static final SaxParserPool<SAXParser> SAX_PARSER_POOL;
+    private static final SaxParserPool<SAXParser> SAX_PARSER_NAMESPACED_POOL;
+
+    private static final Logger LOG = Logger.getLogger(PositionXmlParser.class.getName());
 
     static {
-        DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
+        DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
         DOCUMENT_BUILDER_FACTORY.setNamespaceAware(true);
         DOCUMENT_BUILDER_FACTORY.setValidating(false);
-        SAX_PARSER_FACTORY = SAXParserFactory.newInstance();
+
+        SAXParserFactory SAX_PARSER_FACTORY = SAXParserFactory.newInstance();
         XmlUtils.configureSaxFactory(SAX_PARSER_FACTORY, false, false);
-        NAMESPACE_AWARE_SAX_PARSER_FACTORY = SAXParserFactory.newInstance();
+        SAXParserFactory NAMESPACE_AWARE_SAX_PARSER_FACTORY = SAXParserFactory.newInstance();
         XmlUtils.configureSaxFactory(NAMESPACE_AWARE_SAX_PARSER_FACTORY, true, false);
+        // assuming pool may have one instance per thread
+        long size = Math.min(32, Runtime.getRuntime().availableProcessors());
+        DOM_BUILDER_POOL = new ParserPool<>(size, DOCUMENT_BUILDER_FACTORY::newDocumentBuilder);
+        SAX_PARSER_POOL =
+                new SaxParserPool<>(size, () -> XmlUtils.createSaxParser(SAX_PARSER_FACTORY, true));
+        SAX_PARSER_NAMESPACED_POOL =
+                new SaxParserPool<>(
+                        size,
+                        () -> XmlUtils.createSaxParser(NAMESPACE_AWARE_SAX_PARSER_FACTORY, true));
+    }
+
+    @FunctionalInterface
+    interface ParserFactoryFunction<R> extends SaxParserFactoryFunction<R> {
+        @Override
+        R get() throws ParserConfigurationException;
+    }
+
+    @FunctionalInterface
+    interface SaxParserFactoryFunction<R> {
+        R get() throws ParserConfigurationException, SAXException;
+    }
+
+    // wrapper to do automatic releasing of object back to pool with AutoCloseable
+    static class ReleasableParserContainer<T> implements AutoCloseable {
+
+        T parser;
+
+        AbstractParserPool<T> parent;
+
+        ReleasableParserContainer(T t, AbstractParserPool<T> parent) {
+            parser = t;
+            this.parent = parent;
+        }
+
+        @Override
+        public void close() {
+            parent.release(parser);
+        }
+    }
+
+    interface AbstractParserPool<T> {
+        ReleasableParserContainer<T> acquire() throws ParserConfigurationException, SAXException;
+
+        void release(T obj);
+    }
+
+    private static class SaxParserPool<T> implements AbstractParserPool<T> {
+
+        ConcurrentLinkedQueue<T> pool = Queues.newConcurrentLinkedQueue();
+
+        SaxParserFactoryFunction<T> supplier;
+
+        AtomicInteger currentSize = new AtomicInteger(0);
+
+        Long maxSize;
+
+        SaxParserPool(Long maxSize, SaxParserFactoryFunction<T> supplier) {
+            this.supplier = supplier;
+            this.maxSize = maxSize;
+        }
+
+        @Override
+        public ReleasableParserContainer<T> acquire()
+                throws ParserConfigurationException, SAXException {
+            T value = pool.poll();
+            if (value == null) {
+                checkLimitWhenCreate();
+                value = supplier.get();
+            }
+            return new ReleasableParserContainer<>(value, this);
+        }
+
+        @Override
+        public void release(T obj) {
+            if (currentSize.get() < maxSize) {
+                pool.offer(obj);
+            }
+        }
+
+        void checkLimitWhenCreate() {
+            if (currentSize.incrementAndGet() > maxSize) {
+                currentSize.decrementAndGet();
+                LOG.info("Maximum pool size reached in " + PositionXmlParser.class.getName());
+            }
+        }
+    }
+
+    private static class ParserPool<T> extends SaxParserPool<T> {
+
+        ParserFactoryFunction<T> supplier;
+
+        ParserPool(Long maxSize, ParserFactoryFunction<T> supplier) {
+            super(maxSize, supplier);
+            this.supplier = supplier;
+        }
+
+        @Override
+        public ReleasableParserContainer<T> acquire() throws ParserConfigurationException {
+            T value = pool.poll();
+            if (value == null) {
+                checkLimitWhenCreate();
+                value = supplier.get();
+            }
+            return new ReleasableParserContainer<>(value, this);
+        }
+    }
+
+    // provides pool wrapper for custom DocumentBuilder
+    private static class FakePool implements AbstractParserPool<DocumentBuilder> {
+
+        DocumentBuilderFactory factory;
+
+        FakePool(DocumentBuilderFactory factory) {
+            this.factory = factory;
+        }
+
+        @Override
+        public ReleasableParserContainer<DocumentBuilder> acquire()
+                throws ParserConfigurationException {
+            return new ReleasableParserContainer<>(factory.newDocumentBuilder(), this);
+        }
+
+        @Override
+        public void release(DocumentBuilder obj) {}
     }
 
     /**
@@ -94,7 +229,7 @@ public class PositionXmlParser {
     @NonNull
     public static Document parse(@NonNull InputStream input, boolean namespaceAware)
             throws ParserConfigurationException, SAXException, IOException {
-        return parse(readAllBytes(input), namespaceAware, DOCUMENT_BUILDER_FACTORY);
+        return internalParse(readAllBytes(input), namespaceAware);
     }
 
     @NonNull
@@ -147,7 +282,15 @@ public class PositionXmlParser {
     @NonNull
     public static Document parse(@NonNull byte[] data)
             throws ParserConfigurationException, SAXException, IOException {
-        return parse(data, true, DOCUMENT_BUILDER_FACTORY);
+        return internalParse(data, true);
+    }
+
+    @NonNull
+    private static Document internalParse(@NonNull byte[] data, boolean namespaceAware)
+            throws ParserConfigurationException, SAXException, IOException {
+        String xml = getXmlString(data);
+        xml = XmlUtils.stripBom(xml);
+        return parseInternal(xml, namespaceAware, DOM_BUILDER_POOL);
     }
 
     /**
@@ -176,7 +319,7 @@ public class PositionXmlParser {
             throws ParserConfigurationException, SAXException, IOException {
         String xml = getXmlString(data);
         xml = XmlUtils.stripBom(xml);
-        return parseInternal(xml, namespaceAware, factory);
+        return parseInternal(xml, namespaceAware, new FakePool(factory));
     }
 
     /**
@@ -200,7 +343,7 @@ public class PositionXmlParser {
             throws ParserConfigurationException, IOException {
         String xml = getXmlString(data);
         xml = XmlUtils.stripBom(xml);
-        return parseInternal(xml, namespaceAware, parseErrors);
+        return parseInternalGatherErrors(xml, namespaceAware, parseErrors);
     }
 
     /**
@@ -218,70 +361,77 @@ public class PositionXmlParser {
     public static Document parse(@NonNull String xml, boolean namespaceAware)
             throws ParserConfigurationException, SAXException, IOException {
         xml = XmlUtils.stripBom(xml);
-        return parseInternal(xml, namespaceAware, DOCUMENT_BUILDER_FACTORY);
+        return parseInternal(xml, namespaceAware, DOM_BUILDER_POOL);
     }
 
     @NonNull
     private static Document parseInternal(
-            @NonNull String xml, boolean namespaceAware, @NonNull DocumentBuilderFactory factory)
+            @NonNull String xml,
+            boolean namespaceAware,
+            @NonNull AbstractParserPool<DocumentBuilder> parserPool)
             throws ParserConfigurationException, SAXException, IOException {
         DomBuilder domBuilder;
         boolean retry = false;
-        while (true) {
-            domBuilder = new DomBuilder(xml, factory);
-            try {
-                parseInternal(xml, namespaceAware, domBuilder);
-                break;
-            } catch (SAXException e) {
-                if (retry || !e.getMessage().contains("Content is not allowed in prolog")) {
-                    throw e;
+        try (ReleasableParserContainer<DocumentBuilder> documentBuilder = parserPool.acquire()) {
+            while (true) {
+                domBuilder = new DomBuilder(xml, documentBuilder.parser);
+                try {
+                    saxParseInternal(xml, namespaceAware, domBuilder);
+                    break;
+                } catch (SAXException e) {
+                    if (retry || !e.getMessage().contains("Content is not allowed in prolog")) {
+                        throw e;
+                    }
+                    // Byte order mark in the string? Skip it. There are many markers
+                    // (see http://en.wikipedia.org/wiki/Byte_order_mark) so here we'll
+                    // just skip those up to the XML prolog beginning character, '<'.
+                    xml = xml.replaceFirst("^([\\W]+)<", "<");
+                    retry = true;
                 }
-                // Byte order mark in the string? Skip it. There are many markers
-                // (see http://en.wikipedia.org/wiki/Byte_order_mark) so here we'll
-                // just skip those up to the XML prolog beginning character, '<'.
-                xml = xml.replaceFirst("^([\\W]+)<", "<");
-                retry = true;
             }
         }
         return domBuilder.getDocument();
     }
 
     @NonNull
-    private static Document parseInternal(
+    private static Document parseInternalGatherErrors(
             @NonNull String xml, boolean namespaceAware, @NonNull List<String> parseErrors)
             throws ParserConfigurationException, IOException {
         DomBuilder domBuilder;
         boolean retry = false;
-        while (true) {
-            domBuilder = new DomBuilder(xml, DOCUMENT_BUILDER_FACTORY);
-            try {
-                parseInternal(xml, namespaceAware, domBuilder);
-                break;
-            } catch (SAXException e) {
-                if (retry || !e.getMessage().contains("Content is not allowed in prolog")) {
-                    parseErrors.add(e.getLocalizedMessage());
-                    domBuilder.closeUnfinishedElements();
+        try (ReleasableParserContainer<DocumentBuilder> documentBuilder =
+                DOM_BUILDER_POOL.acquire()) {
+            while (true) {
+                domBuilder = new DomBuilder(xml, documentBuilder.parser);
+                try {
+                    saxParseInternal(xml, namespaceAware, domBuilder);
                     break;
+                } catch (SAXException e) {
+                    if (retry || !e.getMessage().contains("Content is not allowed in prolog")) {
+                        parseErrors.add(e.getLocalizedMessage());
+                        domBuilder.closeUnfinishedElements();
+                        break;
+                    }
+                    // Byte order mark in the string? Skip it. There are many markers
+                    // (see http://en.wikipedia.org/wiki/Byte_order_mark) so here we'll
+                    // just skip those up to the XML prolog beginning character, '<'.
+                    xml = xml.replaceFirst("^([\\W]+)<", "<");
+                    retry = true;
                 }
-                // Byte order mark in the string? Skip it. There are many markers
-                // (see http://en.wikipedia.org/wiki/Byte_order_mark) so here we'll
-                // just skip those up to the XML prolog beginning character, '<'.
-                xml = xml.replaceFirst("^([\\W]+)<", "<");
-                retry = true;
             }
         }
         return domBuilder.getDocument();
     }
 
-    private static void parseInternal(
+    private static void saxParseInternal(
             @NonNull String xml, boolean namespaceAware, @NonNull DefaultHandler handler)
             throws ParserConfigurationException, IOException, SAXException {
-        SAXParserFactory factory =
-                namespaceAware ? NAMESPACE_AWARE_SAX_PARSER_FACTORY : SAX_PARSER_FACTORY;
-        SAXParser parser = XmlUtils.createSaxParser(factory, true);
-        XMLReader xmlReader = parser.getXMLReader();
-        xmlReader.setProperty("http://xml.org/sax/properties/lexical-handler", handler);
-        parser.parse(createSource(xml), handler);
+        try (ReleasableParserContainer<SAXParser> container =
+                namespaceAware ? SAX_PARSER_NAMESPACED_POOL.acquire() : SAX_PARSER_POOL.acquire()) {
+            XMLReader xmlReader = container.parser.getXMLReader();
+            xmlReader.setProperty("http://xml.org/sax/properties/lexical-handler", handler);
+            container.parser.parse(createSource(xml), handler);
+        }
     }
 
     /**
@@ -802,7 +952,21 @@ public class PositionXmlParser {
                         Position attributePosition = new Position(line, column, offset + textIndex);
                         // Also set end range for retrieval in getLocation
                         if (end != -1) {
-                            attributePosition.setEnd(new Position(line, column, offset + end));
+                            int endLine = line;
+                            int endColumn = column;
+                            textLength = Math.min(text.length(), end);
+
+                            for (; textIndex < textLength; textIndex++) {
+                                char t = text.charAt(textIndex);
+                                if (t == '\n') {
+                                    endLine++;
+                                    endColumn = 0;
+                                } else {
+                                    endColumn++;
+                                }
+                            }
+
+                            attributePosition.setEnd(new Position(endLine, endColumn, offset + end));
                         } else {
                             // Search backwards for the last non-space character
                             for (int i = textLength - 1; i >= 0; i--) {
@@ -865,10 +1029,9 @@ public class PositionXmlParser {
         @SuppressWarnings("StringBufferField")
         private final StringBuilder mPendingText = new StringBuilder();
 
-        DomBuilder(String xml, DocumentBuilderFactory factory) throws ParserConfigurationException {
+        DomBuilder(String xml, DocumentBuilder docBuilder) {
             mXml = xml;
 
-            DocumentBuilder docBuilder = factory.newDocumentBuilder();
             mDocument = docBuilder.newDocument();
             mDocument.setUserData(CONTENT_KEY, xml, null);
         }
@@ -883,6 +1046,7 @@ public class PositionXmlParser {
         void closeUnfinishedElements() {
             flushText();
             while (!mStack.isEmpty()) {
+                ProgressManagerAdapter.checkCanceled();
                 Element element = mStack.remove(mStack.size() - 1);
 
                 Position pos = (Position) element.getUserData(POS_KEY);
@@ -901,6 +1065,7 @@ public class PositionXmlParser {
         @Override
         public void startElement(String uri, String localName, String qName,
                 Attributes attributes) throws SAXException {
+            ProgressManagerAdapter.checkCanceled();
             try {
                 flushText();
                 Element element = mDocument.createElementNS(uri, qName);
@@ -938,6 +1103,7 @@ public class PositionXmlParser {
 
         @Override
         public void endElement(String uri, String localName, String qName) {
+            ProgressManagerAdapter.checkCanceled();
             flushText();
             Element element = mStack.remove(mStack.size() - 1);
 
@@ -950,6 +1116,7 @@ public class PositionXmlParser {
 
         @Override
         public void comment(char[] chars, int start, int length) throws SAXException {
+            ProgressManagerAdapter.checkCanceled();
             flushText();
             String comment = new String(chars, start, length);
             Comment domComment = mDocument.createComment(comment);
@@ -1075,18 +1242,21 @@ public class PositionXmlParser {
 
         @Override
         public void startCDATA() {
+            ProgressManagerAdapter.checkCanceled();
             flushText();
             mCdata = true;
         }
 
         @Override
         public void endCDATA() {
+            ProgressManagerAdapter.checkCanceled();
             flushText();
             mCdata = false;
         }
 
         @Override
         public void characters(char[] c, int start, int length) throws SAXException {
+            ProgressManagerAdapter.checkCanceled();
             mPendingText.append(c, start, length);
         }
 

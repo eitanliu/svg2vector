@@ -13,9 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.android;
+
 // import com.android.sdklib.AndroidVersion;
+
 import java.io.File;
+
 /**
  * Constant definition class.<br>
  * <br>
@@ -38,11 +42,13 @@ public final class SdkConstants {
     public static final int PLATFORM_LINUX = 1;
     public static final int PLATFORM_WINDOWS = 2;
     public static final int PLATFORM_DARWIN = 3;
+
     /**
      * Returns current platform, one of {@link #PLATFORM_WINDOWS}, {@link #PLATFORM_DARWIN}, {@link
      * #PLATFORM_LINUX} or {@link #PLATFORM_UNKNOWN}.
      */
     public static final int CURRENT_PLATFORM = currentPlatform();
+
     /**
      * ANDROID_HOME environment variable that specifies the installation path of an Android SDK.
      *
@@ -50,6 +56,7 @@ public final class SdkConstants {
      *     environment variables</a>
      */
     public static final String ANDROID_HOME_ENV = "ANDROID_HOME";
+
     /**
      * ANDROID_SDK_ROOT environment variable that specifies the installation path of an Android SDK.
      *
@@ -58,31 +65,42 @@ public final class SdkConstants {
      *     environment variables</a>
      */
     @Deprecated public static final String ANDROID_SDK_ROOT_ENV = "ANDROID_SDK_ROOT";
+
     /** Property in local.properties file that specifies the path of the Android SDK. */
     public static final String SDK_DIR_PROPERTY = "sdk.dir";
     /** Fallback property in local.properties file that specifies the path of the Android SDK. */
     public static final String ANDROID_DIR_PROPERTY = "android.dir";
+
+    /** Property in local.properties to define shader compiler */
+    public static final String SHADE_COMPILER_DIR_PROPERTY = "glslc.dir";
+
     /**
      * A maximum version of the Android SDK that this version of AGP and Android Studio IDE can
      * safely recommend during its development cycle.
      */
     // public static final AndroidVersion MAX_SUPPORTED_ANDROID_PLATFORM_VERSION =
-    //         new AndroidVersion(34);
+    //         new AndroidVersion(36, 1);
+
     /** Property in local.properties file that specifies the path of the Android NDK. */
     public static final String NDK_DIR_PROPERTY = "ndk.dir";
+
     /** Property in local.properties file that specifies the path of CMake. */
     public static final String CMAKE_DIR_PROPERTY = "cmake.dir";
+
     /** Property in local.properties file that specifies the path to symlink the NDK under. */
     public static final String NDK_SYMLINK_DIR = "ndk.symlinkdir";
+
     /**
      * Property in gradle-wrapper.properties file that specifies the URL to the correct Gradle
      * distribution.
      */
     public static final String GRADLE_DISTRIBUTION_URL_PROPERTY = "distributionUrl";
+
     /** Properties in aar-metadata.properties file */
     public static final String AAR_FORMAT_VERSION_PROPERTY = "aarFormatVersion";
     public static final String AAR_METADATA_VERSION_PROPERTY = "aarMetadataVersion";
     public static final String MIN_COMPILE_SDK_PROPERTY = "minCompileSdk";
+    public static final String MIN_COMPILE_SDK_MINOR_PROPERTY = "minCompileMinorSdk";
     public static final String MIN_ANDROID_GRADLE_PLUGIN_VERSION_PROPERTY =
             "minAndroidGradlePluginVersion";
     public static final String FORCE_COMPILE_SDK_PREVIEW_PROPERTY = "forceCompileSdkPreview";
@@ -90,15 +108,18 @@ public final class SdkConstants {
     public static final String CORE_LIBRARY_DESUGARING_ENABLED_PROPERTY =
             "coreLibraryDesugaringEnabled";
     public static final String DESUGAR_JDK_LIB_PROPERTY = "desugarJdkLib";
+
     /** Properties in app-metadata.properties file */
     public static final String APP_METADATA_VERSION_PROPERTY = "appMetadataVersion";
     public static final String ANDROID_GRADLE_PLUGIN_VERSION_PROPERTY =
             "androidGradlePluginVersion";
     public static final String ANDROID_GAME_DEVELOPMENT_EXTENSION_VERSION_PROPERTY = "agdeVersion";
+
     /** Properties in lint-model-metadata.properties file */
     public static final String MAVEN_GROUP_ID_PROPERTY = "mavenGroupId";
     public static final String MAVEN_ARTIFACT_ID_PROPERTY = "mavenArtifactId";
     public static final String MAVEN_VERSION_PROPERTY = "mavenVersion";
+
     /**
      * The encoding we strive to use for all files we write.
      *
@@ -106,14 +127,19 @@ public final class SdkConstants {
      * {@link java.nio.charset.StandardCharsets#UTF_8} instead of using the String encoding method.
      */
     public static final String UTF_8 = "UTF-8";
+
     /** Charset for the ini file handled by the SDK. */
     public static final String INI_CHARSET = UTF_8;
+
     /** Path separator used by Gradle */
     public static final String GRADLE_PATH_SEPARATOR = ":";
+
     /** An SDK Project's AndroidManifest.xml file */
     public static final String FN_ANDROID_MANIFEST_XML = "AndroidManifest.xml";
-    public static final String FN_SHARED_LIBRARY_ANDROID_MANIFEST_XML =
+
+    public static final String FN_NAMESPACED_SHARED_LIBRARY_ANDROID_MANIFEST_XML =
             "SharedLibraryAndroidManifest.xml";
+
     /** pre-dex jar filename. i.e. "classes.jar" */
     public static final String FN_CLASSES_JAR = "classes.jar";
     /** api.jar filename */
@@ -124,11 +150,14 @@ public final class SdkConstants {
     public static final String FN_APK_CLASSES_N_DEX = "classes%d.dex";
     /** Regex to match dex filenames inside the APK. e.g., classes.dex, classes2.dex */
     public static final String REGEX_APK_CLASSES_DEX = "classes\\d*\\.dex";
+
     /** intermediate publishing between projects */
     public static final String FN_INTERMEDIATE_RES_JAR = "res.jar";
     public static final String FN_INTERMEDIATE_FULL_JAR = "full.jar";
+
     /** list of splits for a variant */
     public static final String FN_APK_LIST = "apk-list.gson";
+
     /** An SDK Project's build.xml file */
     public static final String FN_BUILD_XML = "build.xml";
     /** An SDK Project's build.gradle file */
@@ -189,14 +218,18 @@ public final class SdkConstants {
     public static final String FN_INTENT_ACTIONS_ACTIVITY = "activity_actions.txt";
     /** Intent broadcast actions list file */
     public static final String FN_INTENT_ACTIONS_BROADCAST = "broadcast_actions.txt";
+    /** Permission versions XML file */
+    public static final String FN_PERMISSION_VERSIONS = "permission-versions.xml";
     /** Intent service actions list file */
     public static final String FN_INTENT_ACTIONS_SERVICE = "service_actions.txt";
     /** Intent category list file */
     public static final String FN_INTENT_CATEGORIES = "categories.txt";
     /** Name of the lint library, i.e. "lint.jar" */
     public static final String FN_LINT_JAR = "lint.jar";
+
     /** annotations support jar */
     public static final String FN_ANNOTATIONS_JAR = "annotations.jar";
+
     /** platform build property file */
     public static final String FN_BUILD_PROP = "build.prop";
     /** plugin properties file */
@@ -207,19 +240,26 @@ public final class SdkConstants {
     public static final String FN_DEVICES_XML = "devices.xml";
     /** hardware properties definition file */
     public static final String FN_HARDWARE_INI = "hardware-properties.ini";
+
     /** project property file */
     public static final String FN_PROJECT_PROPERTIES = "project.properties";
+
     /** project local property file */
     public static final String FN_LOCAL_PROPERTIES = "local.properties";
+
     /** project ant property file */
     public static final String FN_ANT_PROPERTIES = "ant.properties";
+
     /** project local property file */
     public static final String FN_GRADLE_WRAPPER_PROPERTIES =
             "gradle-wrapper.properties";
+
     /** Skin layout file */
     public static final String FN_SKIN_LAYOUT = "layout";
+
     /** name of the art runtime profile in aar files (located in the android private assets) */
     public static final String FN_ART_PROFILE = "baseline-prof.txt";
+
     public static final String FN_BINART_ART_PROFILE_FOLDER_IN_APK = "assets/dexopt";
     public static final String FN_BINART_ART_PROFILE_FOLDER_IN_AAB =
             "com.android.tools.build.profiles";
@@ -228,68 +268,89 @@ public final class SdkConstants {
     public static final String FN_DEX_METADATA_PROP = "dex-metadata-map.properties";
     /** name of baseline profiles folder in outputs */
     public static final String FN_OUTPUT_BASELINE_PROFILES = "baselineProfiles";
+
     /** aapt executable (with extension for the current OS) */
     public static final String FN_AAPT =
             "aapt" + ext(".exe", "");
+
     /** aapt2 executable (with extension for the current OS) */
     public static final String FN_AAPT2 =
             "aapt2" + ext(".exe", "");
+
     /** aidl executable (with extension for the current OS) */
     public static final String FN_AIDL =
             "aidl" + ext(".exe", "");
+
     /** renderscript executable (with extension for the current OS) */
     public static final String FN_RENDERSCRIPT =
             "llvm-rs-cc" + ext(".exe", "");
+
     /** renderscript support exe (with extension for the current OS) */
     public static final String FN_BCC_COMPAT =
             "bcc_compat" + ext(".exe", "");
+
     /** renderscript support linker for ARM (with extension for the current OS) */
     public static final String FN_LD_ARM =
             "arm-linux-androideabi-ld" + ext(".exe", "");
+
     /** renderscript support linker for ARM64 (with extension for the current OS) */
     public static final String FN_LD_ARM64 =
             "aarch64-linux-android-ld" + ext(".exe", "");
+
     /** renderscript support linker for X86 (with extension for the current OS) */
     public static final String FN_LD_X86 =
             "i686-linux-android-ld" + ext(".exe", "");
+
     /** renderscript support linker for X86_64 (with extension for the current OS) */
     public static final String FN_LD_X86_64 =
             "x86_64-linux-android-ld" + ext(".exe", "");
+
     /** renderscript support linker for MIPS (with extension for the current OS) */
     public static final String FN_LD_MIPS =
             "mipsel-linux-android-ld" + ext(".exe", "");
+
     /**
      * 64 bit (host) renderscript support linker for all ABIs (with extension for the current OS)
      */
     public static final String FN_LLD =
             "lld" + ext(".exe", "");
+
     /** adb executable (with extension for the current OS) */
     public static final String FN_ADB =
             "adb" + ext(".exe", "");
+
     /** sqlite3 executable (with extension for the current OS) */
     public static final String FN_SQLITE3 =
             "sqlite3" + ext(".exe", "");
+
     /** emulator executable for the current OS */
     public static final String FN_EMULATOR =
             "emulator" + ext(".exe", "");
+
     /** emulator-check executable for the current OS */
     public static final String FN_EMULATOR_CHECK =
             "emulator-check" + ext(".exe", "");
+
     /** zipalign executable (with extension for the current OS) */
     public static final String FN_ZIPALIGN =
             "zipalign" + ext(".exe", "");
+
     /** dexdump executable (with extension for the current OS) */
     public static final String FN_DEXDUMP =
             "dexdump" + ext(".exe", "");
+
     /** proguard executable (with extension for the current OS) */
     public static final String FN_PROGUARD =
             "proguard" + ext(".bat", ".sh");
+
     /** find_lock for Windows (with extension for the current OS) */
     public static final String FN_FIND_LOCK =
             "find_lock" + ext(".exe", "");
+
     /** hprof-conv executable (with extension for the current OS) */
     public static final String FN_HPROF_CONV =
             "hprof-conv" + ext(".exe", "");
+
     /** jack.jar */
     public static final String FN_JACK = "jack.jar";
     /** jill.jar */
@@ -300,26 +361,35 @@ public final class SdkConstants {
     public static final String FN_JACK_JACOCO_REPORTER = "jack-jacoco-reporter.jar";
     /** core-lambda-stubs.jar necessary for lambda compilation. */
     public static final String FN_CORE_LAMBDA_STUBS = "core-lambda-stubs.jar";
+
     /** split-select */
     public static final String FN_SPLIT_SELECT = "split-select" + ext(".exe", "");
+
     /** glslc */
     public static final String FD_SHADER_TOOLS = "shader-tools";
+
     public static final String FN_GLSLC = "glslc" + ext(".exe", "");
+
     /** properties file for SDK Updater packages */
     public static final String FN_SOURCE_PROP = "source.properties";
     /** properties file for content hash of installed packages */
     public static final String FN_CONTENT_HASH_PROP = "content_hash.properties";
     /** properties file for the SDK */
     public static final String FN_SDK_PROP = "sdk.properties";
+
     public static final String FN_ANDROIDX_RS_JAR = "androidx-rs.jar";
     public static final String FN_RENDERSCRIPT_V8_JAR = "renderscript-v8.jar";
+
     public static final String FN_ANDROIDX_RENDERSCRIPT_PACKAGE =
             "androidx.renderscript";
     public static final String FN_RENDERSCRIPT_V8_PACKAGE =
             "android.support.v8.renderscript";
+
     /** filename for gdbserver. */
     public static final String FN_GDBSERVER = "gdbserver";
+
     public static final String FN_GDB_SETUP = "gdb.setup";
+
     /** proguard config file in a bundle. */
     public static final String FN_PROGUARD_TXT = "proguard.txt";
     /** global Android proguard config file */
@@ -342,13 +412,17 @@ public final class SdkConstants {
      * used in the IDE build attribution.
      */
     public static final String FN_AGP_ATTRIBUTION_DATA = "androidGradlePluginAttributionData";
+
     /** File holding list of resource symbols */
     public static final String FN_RESOURCE_SYMBOLS = "resources_symbols.txt";
     /** File holding relative class entries */
     public static final String FN_CLASS_LIST = "classes.txt";
+
     /** File holding data extracted from the navigation xml files */
     public static final String FN_NAVIGATION_JSON = "navigation.json";
+
     /* Folder Names for Android Projects . */
+
     /** Resources folder name, i.e. "res". */
     public static final String FD_RESOURCES = "res";
     /** Assets folder name, i.e. "assets" */
@@ -370,6 +444,10 @@ public final class SdkConstants {
     public static final String FD_TEST_FIXTURES = "testFixtures";
     /** Default java code folder name, i.e. "java" */
     public static final String FD_JAVA = "java";
+
+    /** Default kotlin code folder name, i.e. "kotlin" */
+    public static final String FD_KOTLIN = "kotlin";
+
     /** Default native code folder name, i.e. "jni" */
     public static final String FD_JNI = "jni";
     /** Default gradle folder name, i.e. "gradle" */
@@ -411,8 +489,10 @@ public final class SdkConstants {
     public static final String FD_RS_LIBS = "rsLibs";
     /** rs Libs output folder for support mode */
     public static final String FD_RS_OBJ = "rsObj";
+
     /** jars folder */
     public static final String FD_JARS = "jars";
+
     /** Intermediates folder under the build directory */
     public static final String FD_INTERMEDIATES = "intermediates";
     /** logs folder under the build directory */
@@ -421,7 +501,9 @@ public final class SdkConstants {
     public static final String FD_OUTPUTS = "outputs";
     /** generated folder under the build directory */
     public static final String FD_GENERATED = "generated";
+
     /* Folder Names for the Android SDK */
+
     /** Name of the SDK platforms folder. */
     public static final String FD_PLATFORMS = "platforms";
     /** Name of the SDK addons folder. */
@@ -457,6 +539,7 @@ public final class SdkConstants {
     public static final String FD_IMAGES = "images";
     /** Name of the ABI to support. */
     public static final String ABI_ARMEABI = "armeabi";
+
     public static final String ABI_ARMEABI_V7A = "armeabi-v7a";
     public static final String ABI_ARM64_V8A = "arm64-v8a";
     public static final String ABI_INTEL_ATOM = "x86";
@@ -466,21 +549,25 @@ public final class SdkConstants {
     public static final String ABI_RISCV64 = "riscv64";
     /** Name of the CPU arch to support. */
     public static final String CPU_ARCH_ARM = "arm";
+
     public static final String CPU_ARCH_ARM64 = "arm64";
     public static final String CPU_ARCH_INTEL_ATOM = "x86";
     public static final String CPU_ARCH_INTEL_ATOM64 = "x86_64";
     public static final String CPU_ARCH_MIPS = "mips";
     /** TODO double-check this is appropriate value for mips64 */
     public static final String CPU_ARCH_MIPS64 = "mips64";
+
     public static final String CPU_ARCH_RISCV64 = "riscv64";
     /** Name of the CPU model to support. */
     public static final String CPU_MODEL_CORTEX_A8 = "cortex-a8";
+
     /** Name of the SDK skins folder. */
     public static final String FD_SKINS = "skins";
     /** Name of the SDK samples folder. */
     public static final String FD_SAMPLES = "samples";
     /** Name of the SDK extras folder. */
     public static final String FD_EXTRAS = "extras";
+
     public static final String FD_ANDROID_EXTRAS = "android";
     public static final String FD_M2_REPOSITORY = "m2repository";
     public static final String FD_NDK = "ndk-bundle";
@@ -490,6 +577,7 @@ public final class SdkConstants {
     public static final String FD_GAPID = "gapid";
     /** Sample data for the project sample data */
     public static final String FD_SAMPLE_DATA = "sampledata";
+
     /**
      * Name of an extra's sample folder. Ideally extras should have one {@link #FD_SAMPLES} folder
      * containing one or more sub-folders (one per sample). However some older extras might contain
@@ -534,12 +622,16 @@ public final class SdkConstants {
      * processing by resource compiler.
      */
     public static final String FD_STRIPPED_DOT_DIR = "stripped.dir";
+
     /** Name of the cache folder in the $HOME/.android. */
     public static final String FD_CACHE = "cache";
+
     /** Name of the build attribution internal output folder */
     public static final String FD_BUILD_ATTRIBUTION = "build-attribution";
+
     /** API codename of a release (non preview) system image or platform. */
     public static final String CODENAME_RELEASE = "REL";
+
     /**
      * Namespace pattern for the custom resource XML, i.e. "http://schemas.android.com/apk/res/%s"
      *
@@ -555,128 +647,166 @@ public final class SdkConstants {
      */
     public static final String NS_CUSTOM_RESOURCES_S =
             "http://schemas.android.com/apk/res/%1$s";
+
     /** The name of the uses-library that provides "android.test.runner" */
     public static final String ANDROID_TEST_RUNNER_LIB = "android.test.runner";
+
     /* Folder path relative to the SDK root */
     /**
      * Path of the documentation directory relative to the sdk folder. This is an OS path, ending
      * with a separator.
      */
     public static final String OS_SDK_DOCS_FOLDER = FD_DOCS + File.separator;
+
     /**
      * Path of the platform tools directory relative to the sdk folder. This is an OS path, ending
      * with a separator.
      */
     public static final String OS_SDK_PLATFORM_TOOLS_FOLDER = FD_PLATFORM_TOOLS + File.separator;
+
     /* Folder paths relative to a platform or add-on folder */
+
     /**
      * Path of the images directory relative to a platform or addon folder. This is an OS path,
      * ending with a separator.
      */
     public static final String OS_IMAGES_FOLDER = FD_IMAGES + File.separator;
+
     /**
      * Path of the skin directory relative to a platform or addon folder. This is an OS path, ending
      * with a separator.
      */
     public static final String OS_SKINS_FOLDER = FD_SKINS + File.separator;
+
     /* Folder paths relative to a Platform folder */
+
     /**
      * Path of the data directory relative to a platform folder. This is an OS path, ending with a
      * separator.
      */
     public static final String OS_PLATFORM_DATA_FOLDER = FD_DATA + File.separator;
+
     /**
      * Path of the renderscript directory relative to a platform folder. This is an OS path, ending
      * with a separator.
      */
     public static final String OS_PLATFORM_RENDERSCRIPT_FOLDER = FD_RENDERSCRIPT + File.separator;
+
     /**
      * Path of the samples directory relative to a platform folder. This is an OS path, ending with
      * a separator.
      */
     public static final String OS_PLATFORM_SAMPLES_FOLDER = FD_SAMPLES + File.separator;
+
     /**
      * Path of the resources directory relative to a platform folder. This is an OS path, ending
      * with a separator.
      */
     public static final String OS_PLATFORM_RESOURCES_FOLDER =
             OS_PLATFORM_DATA_FOLDER + FD_RES + File.separator;
+
     /**
      * Path of the fonts directory relative to a platform folder. This is an OS path, ending with a
      * separator.
      */
     public static final String OS_PLATFORM_FONTS_FOLDER =
             OS_PLATFORM_DATA_FOLDER + FD_FONTS + File.separator;
+
     /**
      * Path of the android source directory relative to a platform folder. This is an OS path,
      * ending with a separator.
      */
     public static final String OS_PLATFORM_SOURCES_FOLDER = FD_ANDROID_SOURCES + File.separator;
+
     /**
      * Path of the android templates directory relative to a platform folder. This is an OS path,
      * ending with a separator.
      */
     public static final String OS_PLATFORM_TEMPLATES_FOLDER = FD_TEMPLATES + File.separator;
+
     /**
      * Path of the Ant build rules directory relative to a platform folder. This is an OS path,
      * ending with a separator.
      */
     public static final String OS_PLATFORM_ANT_FOLDER = FD_ANT + File.separator;
+
     /** Path of the attrs.xml file relative to a platform folder. */
     public static final String OS_PLATFORM_ATTRS_XML =
             OS_PLATFORM_RESOURCES_FOLDER
                     + SdkConstants.FD_RES_VALUES
                     + File.separator
                     + FN_ATTRS_XML;
+
     /** Path of the attrs_manifest.xml file relative to a platform folder. */
     public static final String OS_PLATFORM_ATTRS_MANIFEST_XML =
             OS_PLATFORM_RESOURCES_FOLDER
                     + SdkConstants.FD_RES_VALUES
                     + File.separator
                     + FN_ATTRS_MANIFEST_XML;
+
     /** Path of the layoutlib.jar file relative to a platform folder. */
     public static final String OS_PLATFORM_LAYOUTLIB_JAR =
             OS_PLATFORM_DATA_FOLDER + FN_LAYOUTLIB_JAR;
+
     /** Path of the renderscript include folder relative to a platform folder. */
     public static final String OS_FRAMEWORK_RS =
             FN_FRAMEWORK_RENDERSCRIPT + File.separator + FN_FRAMEWORK_INCLUDE;
     /** Path of the renderscript (clang) include folder relative to a platform folder. */
     public static final String OS_FRAMEWORK_RS_CLANG =
             FN_FRAMEWORK_RENDERSCRIPT + File.separator + FN_FRAMEWORK_INCLUDE_CLANG;
+
     /* Folder paths relative to a addon folder */
+
     /**
      * Path of the images directory relative to a folder folder. This is an OS path, ending with a
      * separator.
      */
     public static final String OS_ADDON_LIBS_FOLDER = FD_ADDON_LIBS + File.separator;
+
     /** Skin default */
     public static final String SKIN_DEFAULT = "default";
+
     /** SDK property: ant templates revision */
     public static final String PROP_SDK_ANT_TEMPLATES_REVISION =
             "sdk.ant.templates.revision";
+
     /** SDK property: default skin */
     public static final String PROP_SDK_DEFAULT_SKIN = "sdk.skin.default";
+
     /** LLDB SDK package major.minor revision compatible with the current version of Studio */
     public static final String LLDB_PINNED_REVISION = "3.1";
+
     /* Android Class Constants */
     public static final String CLASS_ACTIVITY = "android.app.Activity";
+
     public static final String CLASS_WATCHFACE_WSL
             = "android.support.wearable.watchface.WatchFaceService";
+
     public static final String CLASS_WATCHFACE_ANDROIDX =
             "androidx.wear.watchface.WatchFaceService";
+
     public static final String CLASS_TILE_SERVICE = "androidx.wear.tiles.TileService";
+
     public static final String CLASS_COMPLICATION_SERVICE_ANDROIDX =
             "androidx.wear.watchface.complications.datasource.ComplicationDataSourceService";
+
     public static final String CLASS_COMPLICATION_SERVICE_WSL =
             "android.support.wearable.complications.ComplicationProviderService";
+
     public static final String CLASS_APPLICATION = "android.app.Application";
+
     public static final String CLASS_SERVICE = "android.app.Service";
+
     public static final String CLASS_BROADCASTRECEIVER =
             "android.content.BroadcastReceiver";
+
     public static final String CLASS_CONTENTPROVIDER =
             "android.content.ContentProvider";
+
     public static final String CLASS_ATTRIBUTE_SET = "android.util.AttributeSet";
+
     public static final String CLASS_INSTRUMENTATION = "android.app.Instrumentation";
+
     public static final String CLASS_INSTRUMENTATION_RUNNER =
             "android.test.InstrumentationTestRunner";
     public static final String CLASS_BUNDLE = "android.os.Bundle";
@@ -704,29 +834,39 @@ public final class SdkConstants {
     public static final String CLASS_PARCELABLE = "android.os.Parcelable";
     public static final String CLASS_PARCEL = "android.os.Parcel";
     public static final String CLASS_FRAGMENT = "android.app.Fragment";
+
     public static final String CLASS_ACTION_PROVIDER = "android.view.ActionProvider";
     public static final String CLASS_V4_ACTION_PROVIDER = "android.support.v4.view.ActionProvider";
     public static final String CLASS_ANDROIDX_ACTION_PROVIDER = "androidx.core.view.ActionProvider";
+
     public static final String CLASS_BACKUP_AGENT = "android.app.backup.BackupAgent";
+
     public static final String CLASS_DRAWABLE = "android.graphics.drawable.Drawable";
+
     /**
      * MockView is part of the layoutlib bridge and used to display classes that have no rendering
      * in the graphical layout editor.
      */
     public static final String CLASS_MOCK_VIEW =
             "com.android.layoutlib.bridge.MockView";
+
     public static final String CLASS_LAYOUT_INFLATER = "android.view.LayoutInflater";
+
     public static final String CLASS_VIEW_PAGER2 = "androidx.viewpager2.widget.ViewPager2";
+
     public static final String CLASS_FRAGMENT_CONTAINER_VIEW =
             "androidx.fragment.app.FragmentContainerView";
+
     public static final String CLASS_AD_VIEW = "com.google.android.gms.ads.AdView";
     public static final String CLASS_MAP_FRAGMENT =
             "com.google.android.gms.maps.MapFragment";
     public static final String CLASS_MAP_VIEW = "com.google.android.gms.maps.MapView";
+
     public static final String CLASS_PERCENT_RELATIVE_LAYOUT =
             "android.support.percent.PercentRelativeLayout";
     public static final String CLASS_PERCENT_FRAME_LAYOUT =
             "android.support.percent.PercentFrameLayout";
+
     public static final String CLASS_BOTTOM_APP_BAR =
             "com.google.android.material.bottomappbar.BottomAppBar";
     public static final String CLASS_CHIP = "com.google.android.material.chip.Chip";
@@ -735,6 +875,7 @@ public final class SdkConstants {
             "com.google.android.material.button.MaterialButton";
     public static final String CLASS_MATERIAL_TOOLBAR =
             "com.google.android.material.appbar.MaterialToolbar";
+
     // Flow Alignment values.
     public static class FlowAlignment {
         public static final String NONE = "none";
@@ -745,18 +886,21 @@ public final class SdkConstants {
         public static final String CENTER = "center";
         public static final String BASELINE = "baseline";
     }
+
     // Flow Style values.
     public static class FlowStyle {
         public static final String SPREAD = "spread";
         public static final String SPREAD_INSIDE = "spread_inside";
         public static final String PACKED = "packed";
     }
+
     public static final String CONSTRAINT_LAYOUT_LIB_GROUP_ID = "com.android.support.constraint";
     public static final String CONSTRAINT_LAYOUT_LIB_ARTIFACT_ID = "constraint-layout";
     public static final String CONSTRAINT_LAYOUT_LIB_ARTIFACT =
             CONSTRAINT_LAYOUT_LIB_GROUP_ID + ":" + CONSTRAINT_LAYOUT_LIB_ARTIFACT_ID;
     /** Latest known version of the ConstraintLayout library (as a string) */
     public static final String LATEST_CONSTRAINT_LAYOUT_VERSION = "1.0.2";
+
     /* FlexboxLayout constants */
     public static final String CLASS_FLEXBOX_LAYOUT = "com.google.android.flexbox.FlexboxLayout";
     public static final String FLEXBOX_LAYOUT = CLASS_FLEXBOX_LAYOUT;
@@ -765,6 +909,7 @@ public final class SdkConstants {
     public static final String FLEXBOX_LAYOUT_LIB_ARTIFACT =
             FLEXBOX_LAYOUT_LIB_GROUP_ID + ":" + FLEXBOX_LAYOUT_LIB_ARTIFACT_ID;
     public static final String LATEST_FLEXBOX_LAYOUT_VERSION = "0.2.3";
+
     public static final String CLASS_SIMPLE_EXO_PLAYER_VIEW =
             "com.google.android.exoplayer2.ui.SimpleExoPlayerView";
     public static final String CLASS_EXO_PLAYBACK_CONTROL_VIEW =
@@ -775,14 +920,22 @@ public final class SdkConstants {
     public static final String EXO_PLAYER_ARTIFACT_ID = "exoplayer";
     public static final String EXO_PLAYER_ARTIFACT =
             EXO_PLAYER_GROUP_ID + ":" + EXO_PLAYER_ARTIFACT_ID;
+
     /* Compose constants */
     public static final String CLASS_COMPOSE = "androidx.compose.Compose";
     /** Name of the Compose interoperability view that can be injected in regular XML layouts. */
     public static final String CLASS_COMPOSE_VIEW = "androidx.compose.ui.platform.ComposeView";
+
     public static final String CLASS_COMPOSE_VIEW_ADAPTER =
             "androidx.compose.ui.tooling.ComposeViewAdapter";
+
+    public static final String CLASS_TILE_SERVICE_VIEW_ADAPTER =
+            "androidx.wear.tiles.tooling.TileServiceViewAdapter";
+
     public static final String ATTR_COMPOSABLE_NAME = "composableName";
+
     public static final String PACKAGE_COMPOSE_ANIMATION = "androidx.compose.animation.core";
+
     /**
      * Returns the appropriate name for the 'mksdcard' command, which is 'mksdcard.exe' for Windows
      * and 'mksdcard' for all other platforms.
@@ -795,6 +948,7 @@ public final class SdkConstants {
         }
         return cmd;
     }
+
     /**
      * Returns current platform
      *
@@ -810,8 +964,10 @@ public final class SdkConstants {
         } else if (os.startsWith("Linux")) {
             return PLATFORM_LINUX;
         }
+
         return PLATFORM_UNKNOWN;
     }
+
     /**
      * Returns current platform's UI name
      *
@@ -826,8 +982,10 @@ public final class SdkConstants {
         } else if (os.startsWith("Linux")) {
             return "Linux";
         }
+
         return "Other";
     }
+
     private static String ext(String windowsExtension, String nonWindowsExtension) {
         if (CURRENT_PLATFORM == PLATFORM_WINDOWS) {
             return windowsExtension;
@@ -835,6 +993,7 @@ public final class SdkConstants {
             return nonWindowsExtension;
         }
     }
+
     /** Default anim resource folder name, i.e. "anim" */
     public static final String FD_RES_ANIM = "anim";
     /** Default animator resource folder name, i.e. "animator" */
@@ -865,7 +1024,9 @@ public final class SdkConstants {
     public static final String FN_RES_BASE = "resources";
     /** Separator between the resource folder qualifier. */
     public static final String RES_QUALIFIER_SEP = "-";
+
     // ---- XML ----
+
     /** URI of the reserved "xml" prefix. */
     public static final String XML_NAMESPACE_URI = "http://www.w3.org/XML/1998/namespace";
     /** URI of the reserved "xmlns" prefix */
@@ -880,11 +1041,13 @@ public final class SdkConstants {
     public static final String ANDROID_NS_NAME = "android";
     /** The default prefix used for the {@link #ANDROID_URI} name space including the colon */
     public static final String ANDROID_NS_NAME_PREFIX = "android:";
+    /** The string length of {@link #ANDROID_NS_NAME_PREFIX} */
     public static final int ANDROID_NS_NAME_PREFIX_LEN = ANDROID_NS_NAME_PREFIX.length();
     /** The default prefix used for the {@link #TOOLS_URI} name space */
     public static final String TOOLS_NS_NAME = "tools";
     /** The default prefix used for the {@link #TOOLS_URI} name space including the colon */
     public static final String TOOLS_NS_NAME_PREFIX = "tools:";
+
     /** The default prefix used for the app */
     public static final String APP_PREFIX = "app";
     /** The entity for the ampersand character */
@@ -899,7 +1062,9 @@ public final class SdkConstants {
     public static final String GT_ENTITY = "&gt;";
     /** The entity for a newline */
     public static final String NEWLINE_ENTITY = "&#xA;";
+
     // ---- Elements and Attributes ----
+
     /** Namespace URI prefix used for all resources. */
     public static final String URI_DOMAIN_PREFIX = "http://schemas.android.com/";
     /** Namespace URI prefix used together with a package names. */
@@ -915,6 +1080,7 @@ public final class SdkConstants {
     public static final String AUTO_URI = "http://schemas.android.com/apk/res-auto";
     /** Namespace used for specifying module distribution */
     public static final String DIST_URI = "http://schemas.android.com/apk/distribution";
+
     public static final String AAPT_URI = "http://schemas.android.com/aapt";
     /** Namespace for xliff in string resources. */
     public static final String XLIFF_URI = "urn:oasis:names:tc:xliff:document:1.2";
@@ -926,15 +1092,19 @@ public final class SdkConstants {
     public static final String AAPT_PREFIX = "aapt";
     /** Default prefix used for distribution attributes */
     public static final String DIST_PREFIX = "dist";
+
     public static final String R_CLASS = "R";
     public static final String ANDROID_PKG = "android";
     public static final String ANDROID_SUPPORT_PKG = "android.support";
     public static final String ANDROIDX_PKG = "androidx";
     public static final String MATERIAL2_PKG = "com.google.android.material";
     public static final String MATERIAL1_PKG = "android.support.design.widget";
+
     public static final String SHERPA_PREFIX = "app";
     public static final String SHERPA_URI = "http://schemas.android.com/apk/res-auto";
+
     /** Namespace for Instant App attributes in manifest files */
+
     // Tags: Manifest
     public static final String TAG_MANIFEST = "manifest";
     public static final String TAG_SERVICE = "service";
@@ -957,6 +1127,13 @@ public final class SdkConstants {
     public static final String TAG_PACKAGE = "package";
     public static final String TAG_PROPERTY = "property";
     public static final String TAG_PROVIDER = "provider";
+    // TODO (b/442571488) - Remove once usages are updated to use specific and general purposes
+    public static final String TAG_PURPOSE = "purpose";
+    public static final String TAG_SPECIFIC_PURPOSE = "specific-purpose";
+    public static final String TAG_GENERAL_PURPOSE = "general-purpose";
+    public static final String TAG_VALID_SPECIFIC_PURPOSE = "valid-specific-purpose";
+    public static final String TAG_VALID_GENERAL_PURPOSE = "valid-general-purpose";
+    public static final String TAG_VALID_PURPOSE = "valid-purpose";
     public static final String TAG_GRANT_PERMISSION = "grant-uri-permission";
     public static final String TAG_PATH_PERMISSION = "path-permission";
     public static final String TAG_ACTION = "action";
@@ -968,6 +1145,9 @@ public final class SdkConstants {
     public static final String TAG_QUERIES = "queries";
     public static final String TAG_INTENT = "intent";
     public static final String TAG_SDK_LIBRARY = "sdk-library";
+    public static final String TAG_URI_RELATIVE_FILTER_GROUP = "uri-relative-filter-group";
+    public static final String TAG_ALLOW_COMPONENT_ACCESS = "allow-component-access";
+
     // Tags: Resources
     public static final String TAG_RESOURCES = "resources";
     public static final String TAG_STRING = "string";
@@ -992,16 +1172,21 @@ public final class SdkConstants {
     public static final String TAG_PUBLIC_GROUP = "public-group";
     public static final String TAG_STAGING_PUBLIC_GROUP = "staging-public-group";
     public static final String TAG_STAGING_PUBLIC_GROUP_FINAL = "staging-public-group-final";
+
     public static final String TAG_JAVA_SYMBOL = "java-symbol";
+
     // Tags: Adaptive icon
     public static final String TAG_ADAPTIVE_ICON = "adaptive-icon";
     public static final String TAG_MASKABLE_ICON = "maskable-icon";
+
     // Font family tag
     public static final String TAG_FONT_FAMILY = "font-family";
     public static final String TAG_FONT = "font";
+
     // Tags: XML
     public static final String TAG_HEADER = "header";
     public static final String TAG_APPWIDGET_PROVIDER = "appwidget-provider";
+
     // Tags: Layouts
     public static final String VIEW_TAG = "view";
     public static final String VIEW_INCLUDE = "include";
@@ -1009,6 +1194,7 @@ public final class SdkConstants {
     public static final String VIEW_FRAGMENT = "fragment";
     public static final String REQUEST_FOCUS = "requestFocus";
     public static final String TAG = "tag";
+
     // Tags: Navigation
     public static final String TAG_INCLUDE = "include";
     public static final String TAG_DEEP_LINK = "deepLink";
@@ -1016,6 +1202,14 @@ public final class SdkConstants {
     public static final String TAG_FRAGMENT = "fragment";
     public static final String TAG_ARGUMENT = "argument";
     public static final String ATTR_MODULE_NAME = "moduleName";
+
+    // Tags: Watch Face
+    public static final String TAG_WATCH_FACE = "WatchFace";
+    public static final String TAG_WATCH_FACES = "WatchFaces";
+    public static final String TAG_WATCH_FACE_INFO = "WatchFaceInfo";
+    public static final String TAG_COMPLICATION = "Complication";
+    public static final String TAG_IMAGE = "Image";
+
     public static final String VIEW = "View";
     public static final String VIEW_GROUP = "ViewGroup";
     public static final String FRAME_LAYOUT = "FrameLayout";
@@ -1073,16 +1267,21 @@ public final class SdkConstants {
     public static final String ADAPTER_VIEW_ANIMATOR = "AdapterViewAnimator";
     public static final String VIDEO_VIEW = "VideoView";
     public static final String SEARCH_VIEW = "SearchView";
+
     public static final String CHIP = CLASS_CHIP;
     public static final String CHIP_GROUP = CLASS_CHIP_GROUP;
+
     public static final String BOTTOM_APP_BAR = CLASS_BOTTOM_APP_BAR;
     public static final String MATERIAL_TOOLBAR = CLASS_MATERIAL_TOOLBAR;
     public static final String MATERIAL_BUTTON = CLASS_MATERIAL_BUTTON;
+
     public static final String VIEW_PAGER2 = CLASS_VIEW_PAGER2;
+
     public static final String FRAGMENT_CONTAINER_VIEW = CLASS_FRAGMENT_CONTAINER_VIEW;
     public static final String AD_VIEW = CLASS_AD_VIEW;
     public static final String MAP_FRAGMENT = CLASS_MAP_FRAGMENT;
     public static final String MAP_VIEW = CLASS_MAP_VIEW;
+
     public static final String CONSTRAINT_BARRIER_TOP = "top";
     public static final String CONSTRAINT_BARRIER_BOTTOM = "bottom";
     public static final String CONSTRAINT_BARRIER_LEFT = "left";
@@ -1090,8 +1289,10 @@ public final class SdkConstants {
     public static final String CONSTRAINT_BARRIER_START = "start";
     public static final String CONSTRAINT_BARRIER_END = "end";
     public static final String CONSTRAINT_REFERENCED_IDS = "constraint_referenced_ids";
+
     // Tags: Drawables
     public static final String TAG_ANIMATION_LIST = "animation-list";
+    public static final String TAG_ANIMATED_IMAGE = "animated-image";
     public static final String TAG_ANIMATED_SELECTOR = "animated-selector";
     public static final String TAG_ANIMATED_VECTOR = "animated-vector";
     public static final String TAG_BITMAP = "bitmap";
@@ -1108,18 +1309,24 @@ public final class SdkConstants {
     public static final String TAG_TRANSITION = "transition";
     public static final String TAG_VECTOR = "vector";
     public static final String TAG_LEVEL_LIST = "level-list";
+
     // Tags: Data-Binding
     public static final String TAG_LAYOUT = "layout";
     public static final String TAG_DATA = "data";
     public static final String TAG_VARIABLE = "variable";
     public static final String TAG_IMPORT = "import";
+
     // Attributes: Manifest
     public static final String ATTR_EXPORTED = "exported";
     public static final String ATTR_PERMISSION = "permission";
     public static final String ATTR_PROCESS = "process";
     public static final String ATTR_MIN_SDK_VERSION = "minSdkVersion";
+    public static final String ATTR_MAX_SDK_VERSION = "maxSdkVersion";
     public static final String ATTR_TARGET_SDK_VERSION = "targetSdkVersion";
     public static final String ATTR_ICON = "icon";
+    public static final String ATTR_SUPPORTS_RTL = "supportsRtl";
+    public static final String ATTR_PARENT_ACTIVITY_NAME = "parentActivityName";
+    public static final String ATTR_UI_OPTIONS = "uiOptions";
     public static final String ATTR_RESOURCE = "resource";
     public static final String ATTR_ROUND_ICON = "roundIcon";
     public static final String ATTR_PACKAGE = "package";
@@ -1134,6 +1341,17 @@ public final class SdkConstants {
     public static final String ATTR_PATH_PATTERN = "pathPattern";
     public static final String ATTR_PATH_SUFFIX = "pathSuffix";
     public static final String ATTR_PATH_ADVANCED_PATTERN = "pathAdvancedPattern";
+    public static final String ATTR_PURPOSE_STRING = "purposeString";
+    public static final String ATTR_FRAGMENT_ADVANCED_PATTERN = "fragmentAdvancedPattern";
+    public static final String ATTR_FRAGMENT_PATTERN = "fragmentPattern";
+    public static final String ATTR_FRAGMENT_PREFIX = "fragmentPrefix";
+    public static final String ATTR_FRAGMENT_SUFFIX = "fragmentSuffix";
+    public static final String ATTR_QUERY = "query";
+    public static final String ATTR_QUERY_ADVANCED_PATTERN = "queryAdvancedPattern";
+    public static final String ATTR_QUERY_PATTERN = "queryPattern";
+    public static final String ATTR_QUERY_PREFIX = "queryPrefix";
+    public static final String ATTR_QUERY_SUFFIX = "querySuffix";
+    public static final String ATTR_ALLOW = "allow";
     public static final String ATTR_ALLOW_BACKUP = "allowBackup";
     public static final String ATTR_DEBUGGABLE = "debuggable";
     public static final String ATTR_READ_PERMISSION = "readPermission";
@@ -1152,6 +1370,7 @@ public final class SdkConstants {
     public static final String ATTR_TARGET_PACKAGE = "targetPackage";
     public static final String ATTR_EXTRACT_NATIVE_LIBS = "extractNativeLibs";
     public static final String ATTR_USE_EMBEDDED_DEX = "useEmbeddedDex";
+    public static final String ATTR_ISOLATED_SPLITS = "isolatedSplits";
     public static final String ATTR_SPLIT_NAME = "splitName";
     public static final String ATTR_FEATURE_SPLIT = "featureSplit";
     public static final String ATTR_TARGET_SANDBOX_VERSION = "targetSandboxVersion";
@@ -1167,9 +1386,12 @@ public final class SdkConstants {
     public static final String ATTR_NO_HISTORY = "noHistory";
     public static final String ATTR_PRIORITY = "priority";
     public static final String ATTR_ORDER = "order";
+
     // Attributes: Resources
     public static final String ATTR_ATTR = "attr";
     public static final String ATTR_NAME = "name";
+    public static final String ATTR_CERT_DIGEST = "certDigest";
+    public static final String ATTR_ACCESS_DEFAULT_COMPONENTS = "accessDefaultComponents";
     public static final String ATTR_FRAGMENT = "fragment";
     public static final String ATTR_TYPE = "type";
     public static final String ATTR_PARENT = "parent";
@@ -1180,11 +1402,14 @@ public final class SdkConstants {
     public static final String ATTR_QUANTITY = "quantity";
     public static final String ATTR_FORMAT = "format";
     public static final String ATTR_PREPROCESSING = "preprocessing";
+
     // Attributes: Data Binding
     public static final String ATTR_ALIAS = "alias";
+
     // Attributes: View Binding
     public static final String ATTR_VIEW_BINDING_IGNORE = "viewBindingIgnore";
     public static final String ATTR_VIEW_BINDING_TYPE = "viewBindingType";
+
     // Attributes: Layout
     public static final String ATTR_LAYOUT_RESOURCE_PREFIX = "layout_";
     public static final String ATTR_CLASS = "class";
@@ -1285,6 +1510,7 @@ public final class SdkConstants {
     public static final String ATTR_NAV_GRAPH = "navGraph";
     public static final String ATTR_USE_TAG = "useTag";
     public static final String ATTR_IGNORE_A11Y_LINTS = "ignoreA11yLints";
+
     // ConstraintLayout Flow
     public static final String ATTR_FLOW_WRAP_MODE = "flow_wrapMode";
     public static final String ATTR_FLOW_MAX_ELEMENTS_WRAP = "flow_maxElementsWrap";
@@ -1304,16 +1530,20 @@ public final class SdkConstants {
     public static final String ATTR_FLOW_VERTICAL_GAP = "flow_verticalGap";
     public static final String ATTR_FLOW_LAST_VERTICAL_BIAS = "flow_lastVerticalBias";
     public static final String ATTR_FLOW_LAST_VERTICAL_STYLE = "flow_lastVerticalStyle";
+
     // Attributes: Drawable
     public static final String ATTR_VIEWPORT_HEIGHT = "viewportHeight";
     public static final String ATTR_VIEWPORT_WIDTH = "viewportWidth";
     public static final String ATTR_PATH_DATA = "pathData";
     public static final String ATTR_FILL_COLOR = "fillColor";
+
     // Attributes: AnimationDrawable
     public static final String ATTR_ONESHOT = "oneshot";
+
     // Attributes: AnimatedStateListDrawable
     public static final String ATTR_FROM_ID = "fromId";
     public static final String ATTR_TO_ID = "toId";
+
     // Attributes: Gradients
     public static final String ATTR_END_X = "endX";
     public static final String ATTR_END_Y = "endY";
@@ -1324,6 +1554,7 @@ public final class SdkConstants {
     public static final String ATTR_GRADIENT_RADIUS = "gradientRadius";
     public static final String ATTR_STOP_COLOR = "color";
     public static final String ATTR_STOP_OFFSET = "offset";
+
     // Attributes: Navigation
     public static final String ATTR_GRAPH = "graph";
     public static final String ATTR_URI = "uri";
@@ -1334,6 +1565,7 @@ public final class SdkConstants {
     public static final String ATTR_ARG_TYPE = "argType";
     public static final String ATTR_DEEPLINK_ACTION = "action";
     public static final String ATTR_DEEPLINK_MIMETYPE = "mimeType";
+
     // android.view.View
     public static final String ATTR_NEXT_CLUSTER_FORWARD = "nextClusterForward";
     public static final String ATTR_NEXT_FOCUS_DOWN = "nextFocusDown";
@@ -1345,35 +1577,45 @@ public final class SdkConstants {
     public static final String ATTR_SCROLLBAR_THUMB_VERTICAL = "scrollbarThumbVertical";
     public static final String ATTR_SCROLLBAR_TRACK_HORIZONTAL = "scrollbarTrackHorizontal";
     public static final String ATTR_SCROLLBAR_TRACK_VERTICAL = "scrollbarTrackVertical";
+
     // android.view.ViewGroup
     public static final String ATTR_LAYOUT_MARGIN_HORIZONTAL = "layout_marginHorizontal";
     public static final String ATTR_LAYOUT_MARGIN_VERTICAL = "layout_marginVertical";
     public static final String ATTR_LAYOUT_PADDING_HORIZONTAL = "layout_paddingHorizontal";
     public static final String ATTR_LAYOUT_PADDING_VERTICAL = "layout_paddingVertical";
+
     // AutoCompleteTextView
     public static final String ATTR_DROP_DOWN_ANCHOR = "dropDownAnchor";
+
     // ProgressBar
     public static final String ATTR_INTERPOLATOR = "interpolator";
+
     // AppCompatSeekBar
     public static final String ATTR_TICK_MARK = "tickMark";
+
     // AbsSeekBar
     public static final String ATTR_TICK_MARK_TINT = "tickMarkTint";
+
     // Toolbar
     public static final String ATTR_COLLAPSE_ICON = "collapseIcon";
     public static final String ATTR_LOGO = "logo";
     public static final String ATTR_TITLE_TEXT_COLOR = "titleTextColor";
     public static final String ATTR_SUBTITLE_TEXT_COLOR = "subtitleTextColor";
+
     // ViewAnimator
     public static final String ATTR_IN_ANIMATION = "inAnimation";
     public static final String ATTR_OUT_ANIMATION = "outAnimation";
+
     // TabWidget
     public static final String ATTR_TAB_STRIP_LEFT = "tabStripLeft";
     public static final String ATTR_TAB_STRIP_RIGHT = "tabStripRight";
+
     // DatePicker
     public static final String ATTR_CALENDAR_TEXT_COLOR = "calendarTextColor";
     public static final String ATTR_DAY_OF_WEEK_BACKGROUND = "dayOfWeekBackground";
     public static final String ATTR_YEAR_LIST_SELECTOR_COLOR = "yearListSelectorColor";
     public static final String ATTR_HEADER_BACKGROUND = "headerBackground";
+
     // TimePicker
     public static final String ATTR_AM_PM_BACKGROUND_COLOR = "amPmBackgroundColor";
     public static final String ATTR_AM_PM_TEXT_COLOR = "amPmTextColor";
@@ -1381,15 +1623,19 @@ public final class SdkConstants {
     public static final String ATTR_NUMBERS_SELECTOR_COLOR = "numbersSelectorColor";
     public static final String ATTR_NUMBERS_TEXT_COLOR = "numbersTextColor";
     public static final String ATTR_NUMBERS_BACKGROUND_COLOR = "numbersBackgroundColor";
+
     // RelativeLayout
     public static final String ATTR_IGNORE_GRAVITY = "ignoreGravity";
+
     // AnalogClock
     public static final String ATTR_DIAL = "dial";
     public static final String ATTR_HAND_HOUR = "hand_hour";
     public static final String ATTR_HAND_MINUTE = "hand_minute";
     public static final String ATTR_HAND_SECOND = "hand_second";
+
     // CalendarView
     public static final String ATTR_SELECTED_DATE_VERTICAL_BAR = "selectedDateVerticalBar";
+
     // TextView attributes
     public static final String ATTR_TEXT_APPEARANCE = "textAppearance";
     public static final String ATTR_FONT_FAMILY = "fontFamily";
@@ -1404,24 +1650,30 @@ public final class SdkConstants {
     public static final String ATTR_SHADOW_COLOR = "shadowColor";
     public static final String ATTR_TEXT_COLOR_HIGHLIGHT = "textColorHighlight";
     public static final String ATTR_AUTO_SIZE_PRESET_SIZES = "autoSizePresetSizes";
+
     // Tools attributes for AdapterView inheritors
     public static final String ATTR_LISTFOOTER = "listfooter";
     public static final String ATTR_LISTHEADER = "listheader";
     public static final String ATTR_LISTITEM = "listitem";
     public static final String ATTR_ITEM_COUNT = "itemCount";
+
     // Tools attributes for scrolling
     public static final String ATTR_SCROLLX = "scrollX";
     public static final String ATTR_SCROLLY = "scrollY";
+
     // Tools attribute for using a different view at design time
     public static final String ATTR_USE_HANDLER = "useHandler";
+
     // AbsoluteLayout layout params
     public static final String ATTR_LAYOUT_Y = "layout_y";
     public static final String ATTR_LAYOUT_X = "layout_x";
+
     // GridLayout layout params
     public static final String ATTR_LAYOUT_ROW = "layout_row";
     public static final String ATTR_LAYOUT_ROW_SPAN = "layout_rowSpan";
     public static final String ATTR_LAYOUT_COLUMN = "layout_column";
     public static final String ATTR_LAYOUT_COLUMN_SPAN = "layout_columnSpan";
+
     // ProgressBar/RatingBar attributes
     public static final String ATTR_MAXIMUM = "max";
     public static final String ATTR_PROGRESS = "progress";
@@ -1438,18 +1690,22 @@ public final class SdkConstants {
     public static final String ATTR_STEP_SIZE = "stepSize";
     public static final String ATTR_IS_INDICATOR = "isIndicator";
     public static final String ATTR_THUMB = "thumb";
+
     // ImageView attributes
     public static final String ATTR_ADJUST_VIEW_BOUNDS = "adjustViewBounds";
     public static final String ATTR_CROP_TO_PADDING = "cropToPadding";
+
     // Font attributes of a TAG_FONT_FAMILY element
     public static final String ATTR_FONT_PROVIDER_AUTHORITY = "fontProviderAuthority";
     public static final String ATTR_FONT_PROVIDER_QUERY = "fontProviderQuery";
     public static final String ATTR_FONT_PROVIDER_PACKAGE = "fontProviderPackage";
     public static final String ATTR_FONT_PROVIDER_CERTS = "fontProviderCerts";
+
     // Font attributes of a TAG_FONT element
     public static final String ATTR_FONT_STYLE = "fontStyle";
     public static final String ATTR_FONT_WEIGHT = "fontWeight";
     public static final String ATTR_FONT = "font";
+
     // ConstraintLayout layout params
     public static final String ATTR_LAYOUT_EDITOR_ABSOLUTE_X =
             "layout_editor_absoluteX";
@@ -1489,6 +1745,7 @@ public final class SdkConstants {
             "layout_constraintBottom_toBottomOf";
     public static final String ATTR_LAYOUT_BASELINE_TO_BASELINE_OF =
             "layout_constraintBaseline_toBaselineOf";
+
     public static final String ATTR_LAYOUT_START_TO_END_OF =
             "layout_constraintStart_toEndOf";
     public static final String ATTR_LAYOUT_START_TO_START_OF =
@@ -1506,10 +1763,12 @@ public final class SdkConstants {
     public static final String ATTR_LAYOUT_GONE_MARGIN_START =
             "layout_goneMarginStart";
     public static final String ATTR_LAYOUT_GONE_MARGIN_END = "layout_goneMarginEnd";
+
     public static final String ATTR_LAYOUT_HORIZONTAL_BIAS =
             "layout_constraintHorizontal_bias";
     public static final String ATTR_LAYOUT_VERTICAL_BIAS =
             "layout_constraintVertical_bias";
+
     public static final String ATTR_LAYOUT_WIDTH_DEFAULT =
             "layout_constraintWidth_default";
     public static final String ATTR_LAYOUT_HEIGHT_DEFAULT =
@@ -1520,6 +1779,7 @@ public final class SdkConstants {
     public static final String ATTR_LAYOUT_HEIGHT_MIN = "layout_constraintHeight_min";
     public static final String ATTR_LAYOUT_HEIGHT_MAX = "layout_constraintHeight_max";
     public static final String ATTR_LAYOUT_HEIGHT_PERCENT = "layout_constraintHeight_percent";
+
     public static final String ATTR_LAYOUT_DIMENSION_RATIO =
             "layout_constraintDimensionRatio";
     public static final String ATTR_LAYOUT_VERTICAL_CHAIN_STYLE =
@@ -1537,13 +1797,15 @@ public final class SdkConstants {
     public static final String ATTR_LAYOUT_CONSTRAINTSET = "constraintSet";
     public static final String ATTR_LAYOUT_CONSTRAINT_CIRCLE = "layout_constraintCircle";
     public static final String ATTR_LAYOUT_CONSTRAINT_CIRCLE_ANGLE = "layout_constraintCircleAngle";
-    public static final String ATTR_LAYOUT_CONSTRAINT_CIRCLE_RADIUS = "layout_constraintCircleRadius";
+    public static final String ATTR_LAYOUT_CONSTRAINT_CIRCLE_RADIUS =
+            "layout_constraintCircleRadius";
     public static final String ATTR_LAYOUT_CONSTRAINED_HEIGHT = "layout_constrainedHeight";
     public static final String ATTR_LAYOUT_CONSTRAINED_WIDTH = "layout_constrainedWidth";
     public static final String ATTR_CONSTRAINT_SET_START = "constraintSetStart";
     public static final String ATTR_CONSTRAINT_SET_END = "constraintSetEnd";
     public static final String ATTR_DERIVE_CONSTRAINTS_FROM = "deriveConstraintsFrom";
     public static final String ATTR_LAYOUT_CONSTRAINT_TAG = "layout_constraintTag";
+
     public static final String ATTR_GUIDELINE_ORIENTATION_HORIZONTAL = "horizontal";
     public static final String ATTR_GUIDELINE_ORIENTATION_VERTICAL = "vertical";
     public static final String LAYOUT_CONSTRAINT_GUIDE_BEGIN =
@@ -1556,32 +1818,39 @@ public final class SdkConstants {
             "layout_constraintGuide_Percent";
     public static final String ATTR_LOCKED = "locked";
     public static final String ATTR_CONSTRAINT_LAYOUT_DESCRIPTION =
-            "layoutDescription";
+      "layoutDescription";
+
     // MotionLayout
     public static final String ATTR_MOTION_TARGET = "motionTarget";
     public static final String ATTR_MOTION_WAVE_OFFSET = "waveOffset";
     public static final String ATTR_MOTION_TARGET_ID = "targetId";
     public static final String ATTR_MOTION_TOUCH_ANCHOR_ID = "touchAnchorId";
     public static final String ATTR_MOTION_TOUCH_REGION_ID = "touchRegionId";
+
     // AbsListView
     public static final String ATTR_LIST_SELECTOR = "listSelector";
+
     // ListView
     public static final String ATTR_OVER_SCROLL_FOOTER = "overScrollFooter";
     public static final String ATTR_OVER_SCROLL_HEADER = "overScrollHeader";
     public static final String ATTR_CHILD_DIVIDER = "childDivider";
+
     // SearchView
     public static final String ATTR_QUERY_BACKGROUND = "queryBackground";
     public static final String ATTR_SUBMIT_BACKGROUND = "submitBackground";
+
     // SimpleExoPlayerView
     public static final String ATTR_RESIZE_MODE = "resize_mode";
     public static final String ATTR_FAST_FORWARD_INCREMENT = "fastforward_increment";
     public static final String ATTR_REWIND_INCREMENT = "rewind_increment";
+
     // FlexboxLayout params
     public static final String ATTR_FLEX_DIRECTION = "flexDirection";
     public static final String ATTR_FLEX_WRAP = "flexWrap";
     public static final String ATTR_JUSTIFY_CONTENT = "justifyContent";
     public static final String ATTR_ALIGN_ITEMS = "alignItems";
     public static final String ATTR_ALIGN_CONTENT = "alignContent";
+
     // FlexboxLayout layout params
     public static final String ATTR_LAYOUT_ORDER = "layout_order";
     public static final String ATTR_LAYOUT_FLEX_GROW = "layout_flexGrow";
@@ -1593,8 +1862,10 @@ public final class SdkConstants {
     public static final String ATTR_LAYOUT_MAX_WIDTH = "layout_maxWidth";
     public static final String ATTR_LAYOUT_MAX_HEIGHT = "layout_maxHeight";
     public static final String ATTR_LAYOUT_WRAP_BEFORE = "layout_wrapBefore";
+
     // TableRow
     public static final String ATTR_LAYOUT_SPAN = "layout_span";
+
     // RelativeLayout layout params:
     public static final String ATTR_LAYOUT_ALIGN_LEFT = "layout_alignLeft";
     public static final String ATTR_LAYOUT_ALIGN_RIGHT = "layout_alignRight";
@@ -1625,10 +1896,12 @@ public final class SdkConstants {
     public static final String ATTR_LAYOUT_TO_END_OF = "layout_toEndOf";
     public static final String ATTR_LAYOUT_BELOW = "layout_below";
     public static final String ATTR_LAYOUT_ABOVE = "layout_above";
+
     // Spinner
     public static final String ATTR_DROPDOWN_SELECTOR = "dropDownSelector";
     public static final String ATTR_POPUP_BACKGROUND = "popupBackground";
     public static final String ATTR_SPINNER_MODE = "spinnerMode";
+
     // Margins
     public static final String ATTR_LAYOUT_MARGIN = "layout_margin";
     public static final String ATTR_LAYOUT_MARGIN_LEFT = "layout_marginLeft";
@@ -1637,8 +1910,10 @@ public final class SdkConstants {
     public static final String ATTR_LAYOUT_MARGIN_END = "layout_marginEnd";
     public static final String ATTR_LAYOUT_MARGIN_TOP = "layout_marginTop";
     public static final String ATTR_LAYOUT_MARGIN_BOTTOM = "layout_marginBottom";
+
     // Attributes: Drawables
     public static final String ATTR_TILE_MODE = "tileMode";
+
     // Attributes: Design and support lib
     public static final String ATTR_LAYOUT_ANCHOR = "layout_anchor";
     public static final String ATTR_LAYOUT_ANCHOR_GRAVITY = "layout_anchorGravity";
@@ -1702,6 +1977,7 @@ public final class SdkConstants {
     public static final String ATTR_NAVIGATION_ICON = "navigationIcon";
     public static final String ATTR_LIFT_ON_SCROLL_TARGET_VIEW_ID = "liftOnScrollTargetViewId";
     public static final String ATTR_STATUS_BAR_FOREGROUND = "statusBarForeground";
+
     // Material BottomAppBar Attributes
     public static final String ATTR_FAB_ALIGNMENT_MODE = "fabAlignmentMode";
     public static final String ATTR_FAB_ANIMATION_MODE = "fabAnimationMode";
@@ -1709,6 +1985,7 @@ public final class SdkConstants {
     public static final String ATTR_FAB_CRADLE_ROUNDED_CORNER_RADIUS =
             "fabCradleRoundedCornerRadius";
     public static final String ATTR_FAB_CRADLE_VERTICAL_OFFSET = "fabCradleVerticalOffset";
+
     // Material Button Attributes
     public static final String ATTR_INSET_LEFT = "insetLeft";
     public static final String ATTR_INSET_RIGHT = "insetRight";
@@ -1723,9 +2000,11 @@ public final class SdkConstants {
     public static final String ATTR_STROKE_COLOR = "strokeColor";
     public static final String ATTR_STROKE_WIDTH = "strokeWidth";
     public static final String ATTR_CORNER_RADIUS = "cornerRadius";
+
     // Material CollapsingToolbarLayout
     public static final String ATTR_CONTENT_SCRIM = "contentScrim";
     public static final String ATTR_STATUS_BAR_SCRIM = "statusBarScrim";
+
     // Material FloatingActionButton Attributes
     public static final String ATTR_FAB_CUSTOM_SIZE = "fabCustomSize";
     public static final String ATTR_HOVERED_FOCUSED_TRANSLATION_Z = "hoveredFocusedTranslationZ";
@@ -1735,23 +2014,27 @@ public final class SdkConstants {
     public static final String ATTR_MAX_IMAGE_SIZE = "maxImageSize";
     public static final String ATTR_SHOW_MOTION_SPEC = "showMotionSpec";
     public static final String ATTR_HIDE_MOTION_SPEC = "hideMotionSpec";
+
     // Material NavigationView
     public static final String ATTR_INSET_BACKGROUND = "insetBackground";
     public static final String ATTR_INSET_FOREGROUND = "insetForeground";
     public static final String ATTR_ITEM_SHAPE_APPEARANCE = "itemShapeAppearance";
     public static final String ATTR_ITEM_SHAPE_APPEARANCE_OVERLAY = "itemShapeAppearanceOverlay";
     public static final String ATTR_ITEM_SHAPE_FILL_COLOR = "itemShapeFillColor";
+
     // Material BottomNavigationView Attributes
     public static final String ATTR_ITEM_HORIZONTAL_TRANSLATION_ENABLED =
             "itemHorizontalTranslationEnabled";
     public static final String ATTR_ITEM_RIPPLE_COLOR = "itemRippleColor";
     public static final String ATTR_LABEL_VISIBILITY_MODE = "labelVisibilityMode";
+
     // Material ChipGroup Attributes
     public static final String ATTR_CHIP_SPACING = "chipSpacing";
     public static final String ATTR_CHIP_SPACING_HORIZONTAL = "chipSpacingHorizontal";
     public static final String ATTR_CHIP_SPACING_VERTICAL = "chipSpacingVertical";
     public static final String ATTR_SINGLE_SELECTION = "singleSelection";
     public static final String ATTR_CHECKED_CHIP = "checkedChip";
+
     // Material Chip (ChipDrawable) Attributes
     public static final String ATTR_CHIP_BACKGROUND_COLOR = "chipBackgroundColor";
     public static final String ATTR_CHIP_TEXT = "chipText";
@@ -1765,6 +2048,7 @@ public final class SdkConstants {
     public static final String ATTR_CLOSE_ICON = "closeIcon";
     public static final String ATTR_CLOSE_ICON_TINT = "closeIconTint";
     public static final String ATTR_CLOSE_ICON_VISIBLE = "closeIconVisible";
+
     // Material TabLayout Attributes
     public static final String ATTR_TAB_INDICATOR_HEIGHT = "tabIndicatorHeight";
     public static final String ATTR_TAB_BACKGROUND = "tabBackground";
@@ -1793,6 +2077,7 @@ public final class SdkConstants {
     public static final String ATTR_TAB_RIPPLE_COLOR = "tabRippleColor";
     public static final String ATTR_TAB_UNBOUNDED_RIPPLE = "tabUnboundedRipple";
     public static final String ATTR_LAYOUT_SCROLL_INTERPOLATOR = "layout_scrollInterpolator";
+
     // Material TextInputLayout Attributes
     public static final String ATTR_END_ICON_TINT = "endIconTint";
     public static final String ATTR_ERROR_ICON_TINT = "errorIconTint";
@@ -1826,9 +2111,11 @@ public final class SdkConstants {
     public static final String ATTR_BOX_STROKE_COLOR = "boxStrokeColor";
     public static final String ATTR_BOX_BACKGROUND_COLOR = "boxBackgroundColor";
     public static final String ATTR_BOX_STROKE_WIDTH = "boxStrokeWidth";
+
     // Values: Manifest
     public static final String VALUE_SPLIT_ACTION_BAR_WHEN_NARROW =
             "splitActionBarWhenNarrow";
+
     // Values: Layouts
     public static final String VALUE_FILL_PARENT = "fill_parent";
     public static final String VALUE_MATCH_PARENT = "match_parent";
@@ -1839,19 +2126,25 @@ public final class SdkConstants {
     public static final String VALUE_AUTO_FIT = "auto_fit";
     public static final String VALUE_SELECTABLE_ITEM_BACKGROUND =
             "?android:attr/selectableItemBackground";
+
     // Values: Resources
     public static final String VALUE_ID = "id";
+
     // Values: Drawables
     public static final String VALUE_DISABLED = "disabled";
     public static final String VALUE_CLAMP = "clamp";
+
     // Values: Wear
     public static final String VALUE_COMPLICATION_SUPPORTED_TYPES =
             "android.support.wearable.complications.SUPPORTED_TYPES";
+
     // Value delimiters: Manifest
     public static final String VALUE_DELIMITER_PIPE = "|";
+
     // Pseudolocale Values
     public static final String EN_XA = "en-rXA";
     public static final String AR_XB = "ar-rXB";
+
     // Menus
     public static final String ATTR_CHECKABLE = "checkable";
     public static final String ATTR_CHECKABLE_BEHAVIOR = "checkableBehavior";
@@ -1861,6 +2154,7 @@ public final class SdkConstants {
     public static final String ATTR_VISIBLE = "visible";
     public static final String VALUE_IF_ROOM = "ifRoom";
     public static final String VALUE_ALWAYS = "always";
+
     // Units
     public static final String UNIT_DP = "dp";
     public static final String UNIT_DIP = "dip";
@@ -1869,6 +2163,7 @@ public final class SdkConstants {
     public static final String UNIT_IN = "in";
     public static final String UNIT_MM = "mm";
     public static final String UNIT_PT = "pt";
+
     // Filenames and folder names
     public static final String ANDROID_MANIFEST_XML = "AndroidManifest.xml";
     public static final String OLD_PROGUARD_FILE = "proguard.cfg";
@@ -1878,6 +2173,7 @@ public final class SdkConstants {
     public static final String SRC_FOLDER = "src";
     public static final String LIBS_FOLDER = "libs";
     public static final String BIN_FOLDER = "bin";
+
     public static final String RES_FOLDER = "res";
     public static final String DOT_XML = ".xml";
     public static final String DOT_XSD = ".xsd";
@@ -1896,6 +2192,7 @@ public final class SdkConstants {
     public static final String DOT_SRCJAR = ".srcjar";
     public static final String DOT_KLIB = ".klib";
     public static final String DOT_GRADLE = ".gradle";
+    public static final String DOT_GRADLE_KTS = ".gradle.kts";
     public static final String DOT_DECLARATIVE = ".dcl";
     public static final String DOT_PROPERTIES = ".properties";
     public static final String DOT_JSON = ".json";
@@ -1907,6 +2204,10 @@ public final class SdkConstants {
     public static final String DOT_AVIF = ".avif";
     public static final String DOT_TOML = ".toml";
     public static final String DOT_VERSIONS_DOT_TOML = ".versions.toml";
+    public static final String KEEP_RULES_FOLDER = "keepRules";
+    public static final String DOT_KEEP = ".keep";
+
+
     /** Extension of the Application package Files, i.e. "apk". */
     public static final String EXT_ANDROID_PACKAGE = "apk";
     /** Extension of the InstantApp package Files, i.e. "iapk". */
@@ -1923,6 +2224,10 @@ public final class SdkConstants {
     public static final String EXT_ATOM = "atom";
     /** Extension of java files, i.e. "java" */
     public static final String EXT_JAVA = "java";
+
+    /** Extension of kotlin files, i.e. "kt" */
+    public static final String EXT_KT = "kt";
+
     /** Extension of compiled java files, i.e. "class" */
     public static final String EXT_CLASS = "class";
     /** Extension of xml files, i.e. "xml" */
@@ -1959,15 +2264,21 @@ public final class SdkConstants {
     public static final String EXT_PNG = "png";
     /** Extension of app bundle files, i.e. "aab" */
     public static final String EXT_APP_BUNDLE = "aab";
+
     public static final String EXT_HPROF = "hprof";
     public static final String EXT_GZ = "gz";
+
     public static final String EXT_JSON = "json";
+
     public static final String EXT_CSV = "csv";
+
     /** Extension of native debug metadata files, i.e. "dbg" */
     public static final String EXT_DBG = "dbg";
     /** Extension of native debug symbol table files, i.e. "sym" */
     public static final String EXT_SYM = "sym";
+
     private static final String DOT = ".";
+
     /** Dot-Extension of the Application package Files, i.e. ".apk". */
     public static final String DOT_ANDROID_PACKAGE = DOT + EXT_ANDROID_PACKAGE;
     /** Dot-Extension for Android archive files */
@@ -2014,6 +2325,7 @@ public final class SdkConstants {
     public static final String DOT_SYM = ".sym";
     /** Dot-Extension of TensorFlow Lite FlatBuffer files, i.e., ".tflite" */
     public static final String DOT_TFLITE = ".tflite";
+
     /** Resource base name for java files and classes */
     public static final String FN_RESOURCE_BASE = "R";
     /** Resource java class filename, i.e. "R.java" */
@@ -2046,6 +2358,7 @@ public final class SdkConstants {
      */
     public static final String PRIVACY_SANDBOX_SDK_DEPENDENCY_MANIFEST_SNIPPET_NAME_SUFFIX =
             "-privacy-sandbox-sdk-dependency-manifest-snippet" + DOT_XML;
+
     public static final String DRAWABLE_FOLDER = "drawable";
     public static final String MIPMAP_FOLDER = "mipmap";
     public static final String DRAWABLE_XHDPI = "drawable-xhdpi";
@@ -2054,6 +2367,7 @@ public final class SdkConstants {
     public static final String DRAWABLE_HDPI = "drawable-hdpi";
     public static final String DRAWABLE_MDPI = "drawable-mdpi";
     public static final String DRAWABLE_LDPI = "drawable-ldpi";
+
     // Resources
     public static final String PREFIX_RESOURCE_REF = "@";
     public static final String PREFIX_THEME_REF = "?";
@@ -2076,13 +2390,16 @@ public final class SdkConstants {
     public static final String AAPT_ATTR_PREFIX = "@aapt:_aapt/";
     public static final String SAMPLE_PREFIX = "@sample/";
     public static final String NAVIGATION_PREFIX = "@navigation/";
+
     public static final String TOOLS_SAMPLE_PREFIX = "@tools:sample/";
+
     public static final String ANDROID_LAYOUT_RESOURCE_PREFIX = "@android:layout/";
     public static final String ANDROID_STYLE_RESOURCE_PREFIX = "@android:style/";
     public static final String ANDROID_COLOR_RESOURCE_PREFIX = "@android:color/";
     public static final String ANDROID_ID_PREFIX = "@android:id/";
     public static final String ANDROID_DRAWABLE_PREFIX = "@android:drawable/";
     public static final String ANDROID_STRING_PREFIX = "@android:string/";
+
     public static final String RESOURCE_CLZ_ID = "id";
     public static final String RESOURCE_CLZ_COLOR = "color";
     public static final String RESOURCE_CLZ_ARRAY = "array";
@@ -2093,20 +2410,24 @@ public final class SdkConstants {
     public static final String REFERENCE_STYLE = "style/";
     public static final String PREFIX_ANDROID = "android:";
     public static final String PREFIX_APP = "app:";
+
     // Resource Types
     public static final String DRAWABLE_TYPE = "drawable";
     public static final String MENU_TYPE = "menu";
+
     // Packages
     public static final String ANDROID_PKG_PREFIX = ANDROID_PKG + ".";
     public static final String ANDROIDX_PKG_PREFIX = ANDROIDX_PKG + ".";
     public static final String WIDGET_PKG_PREFIX = "android.widget.";
     public static final String VIEW_PKG_PREFIX = "android.view.";
+
     // Project properties
     public static final String ANDROID_LIBRARY = "android.library";
     public static final String PROGUARD_CONFIG = "proguard.config";
     public static final String ANDROID_LIBRARY_REFERENCE_FORMAT =
             "android.library.reference.%1$d";
     public static final String PROJECT_PROPERTIES = "project.properties";
+
     // Java References
     public static final String ATTR_REF_PREFIX = "?attr/";
     public static final String R_PREFIX = "R.";
@@ -2115,9 +2436,11 @@ public final class SdkConstants {
     public static final String R_DRAWABLE_PREFIX = "R.drawable.";
     public static final String R_STYLEABLE_PREFIX = "R.styleable.";
     public static final String R_ATTR_PREFIX = "R.attr.";
+
     // Attributes related to tools
     public static final String ATTR_IGNORE = "ignore";
     public static final String ATTR_LOCALE = "locale";
+
     // SuppressLint
     public static final String SUPPRESS_ALL = "all";
     public static final String SUPPRESS_LINT = "SuppressLint";
@@ -2127,16 +2450,20 @@ public final class SdkConstants {
             "android.annotation." + SUPPRESS_LINT;
     public static final String FQCN_TARGET_API = "android.annotation." + TARGET_API;
     public static final String KOTLIN_SUPPRESS = "kotlin.Suppress";
+
     // Class Names
     public static final String CONSTRUCTOR_NAME = "<init>";
     public static final String CLASS_CONSTRUCTOR = "<clinit>";
+
     // Method Names
     public static final String FORMAT_METHOD = "format";
     public static final String GET_STRING_METHOD = "getString";
     public static final String SET_CONTENT_VIEW_METHOD = "setContentView";
     public static final String INFLATE_METHOD = "inflate";
+
     public static final String ATTR_TAG = "tag";
     public static final String ATTR_NUM_COLUMNS = "numColumns";
+
     // Some common layout element names
     public static final String CALENDAR_VIEW = "CalendarView";
     public static final String CHRONOMETER = "Chronometer";
@@ -2144,6 +2471,7 @@ public final class SdkConstants {
     public static final String SPACE = "Space";
     public static final String GESTURE_OVERLAY_VIEW = "GestureOverlayView";
     public static final String QUICK_CONTACT_BADGE = "QuickContactBadge";
+
     public static final String ATTR_HANDLE = "handle";
     public static final String ATTR_BUTTON = "button";
     public static final String ATTR_BUTTON_TINT = "buttonTint";
@@ -2167,6 +2495,7 @@ public final class SdkConstants {
     public static final String ATTR_SPLIT_TRACK = "splitTrack";
     public static final String ATTR_STATE_LIST_ANIMATOR = "stateListAnimator";
     public static final String ATTR_LAYOUT_ANIMATION = "layoutAnimation";
+
     // TextView
     public static final String ATTR_DRAWABLE_RIGHT = "drawableRight";
     public static final String ATTR_DRAWABLE_LEFT = "drawableLeft";
@@ -2175,6 +2504,7 @@ public final class SdkConstants {
     public static final String ATTR_DRAWABLE_BOTTOM = "drawableBottom";
     public static final String ATTR_DRAWABLE_TOP = "drawableTop";
     public static final String ATTR_DRAWABLE_PADDING = "drawablePadding";
+
     // AppCompatTextView
     public static final String ATTR_DRAWABLE_RIGHT_COMPAT = "drawableRightCompat";
     public static final String ATTR_DRAWABLE_LEFT_COMPAT = "drawableLeftCompat";
@@ -2182,9 +2512,11 @@ public final class SdkConstants {
     public static final String ATTR_DRAWABLE_END_COMPAT = "drawableEndCompat";
     public static final String ATTR_DRAWABLE_BOTTOM_COMPAT = "drawableBottomCompat";
     public static final String ATTR_DRAWABLE_TOP_COMPAT = "drawableTopCompat";
+
     public static final String ATTR_USE_DEFAULT_MARGINS = "useDefaultMargins";
     public static final String ATTR_MARGINS_INCLUDED_IN_ALIGNMENT =
             "marginsIncludedInAlignment";
+
     public static final String VALUE_WRAP_CONTENT = "wrap_content";
     public static final String VALUE_FALSE = "false";
     public static final String VALUE_N_DP = "%ddp";
@@ -2198,6 +2530,7 @@ public final class SdkConstants {
     public static final String VALUE_FILL_VERTICAL = "fill_vertical";
     public static final String VALUE_0 = "0";
     public static final String VALUE_1 = "1";
+
     // Gravity values. These have the GRAVITY_ prefix in front of value because we already
     // have VALUE_CENTER_HORIZONTAL defined for layouts, and its definition conflicts
     // (centerHorizontal versus center_horizontal)
@@ -2216,6 +2549,7 @@ public final class SdkConstants {
     public static final String GRAVITY_VALUE_CLIP_HORIZONTAL = "clip_horizontal";
     public static final String GRAVITY_VALUE_CLIP_VERTICAL = "clip_vertical";
     public static final String GRAVITY_VALUE_FILL = "fill";
+
     // Baselines
     /**
      * Root tag in baseline files (which can be the XML output report files from lint, or a
@@ -2229,9 +2563,11 @@ public final class SdkConstants {
     public static final String ATTR_FILE = "file";
     public static final String ATTR_LINE = "line";
     public static final String ATTR_COLUMN = "column";
+
     public static final class ImageViewAttributes {
         public static final String TINT = "tint";
     }
+
     public static final class PreferenceTags {
         public static final String CHECK_BOX_PREFERENCE = "CheckBoxPreference";
         public static final String EDIT_TEXT_PREFERENCE = "EditTextPreference";
@@ -2246,6 +2582,7 @@ public final class SdkConstants {
         public static final String SWITCH_PREFERENCE_COMPAT = "SwitchPreferenceCompat";
         public static final String INTENT = "intent";
     }
+
     public static final class PreferenceClasses {
         public static final String CLASS_PREFERENCE = ANDROID_PREFERENCE_PKG + "Preference";
         public static final String CLASS_PREFERENCE_GROUP =
@@ -2275,6 +2612,7 @@ public final class SdkConstants {
         public static final String CLASS_TWO_STATE_PREFERENCE =
                 ANDROID_PREFERENCE_PKG + "TwoStatePreference";
     }
+
     public static final class PreferenceAttributes {
         public static final String ATTR_DEFAULT_VALUE = "defaultValue";
         public static final String ATTR_DEPENDENCY = "dependency";
@@ -2295,6 +2633,7 @@ public final class SdkConstants {
         public static final String ATTR_SWITCH_TEXT_ON = "switchTextOn";
         public static final String ATTR_SWITCH_TEXT_OFF = "switchTextOff";
     }
+
     public static class MotionSceneTags {
         public static final String MOTION_SCENE = "MotionScene";
         public static final String TRANSITION = "Transition";
@@ -2320,6 +2659,7 @@ public final class SdkConstants {
         public static final String STATE = "State";
         public static final String VARIANT = "Variant";
     }
+
     public static class MotionSceneAttributes {
         public static final String ATTR_CUSTOM_ATTRIBUTE_NAME = "attributeName";
         public static final String ATTR_CUSTOM_COLOR_VALUE = "customColorValue";
@@ -2331,6 +2671,7 @@ public final class SdkConstants {
         public static final String ATTR_CUSTOM_PIXEL_DIMENSION_VALUE = "customPixelDimension";
         public static final String ATTR_CUSTOM_BOOLEAN_VALUE = "customBoolean";
     }
+
     // Text Alignment values.
     public static class TextAlignment {
         public static final String NONE = "none";
@@ -2342,16 +2683,19 @@ public final class SdkConstants {
         public static final String VIEW_START = "viewStart";
         public static final String VIEW_END = "viewEnd";
     }
+
     public static class TextStyle {
         public static final String VALUE_NORMAL = "normal";
         public static final String VALUE_BOLD = "bold";
         public static final String VALUE_ITALIC = "italic";
     }
+
     public static class InputType {
         public static final String VALUE_NUMBER_PASSWORD = "numberPassword";
         public static final String VALUE_TEXT_PASSWORD = "textPassword";
         public static final String VALUE_TEXT_VISIBLE_PASSWORD = "textVisiblePassword";
         public static final String VALUE_TEXT_WEB_PASSWORD = "textWebPassword";
+
         public static final String REF_TYPE_NUMBER_VARIATION_PASSWORD =
                 "TYPE_NUMBER_VARIATION_PASSWORD";
         public static final String REF_TYPE_TEXT_VARIATION_PASSWORD =
@@ -2361,185 +2705,269 @@ public final class SdkConstants {
         public static final String REF_TYPE_TEXT_VARIATION_WEB_PASSWORD =
                 "TYPE_TEXT_VARIATION_WEB_PASSWORD";
     }
+
     public static final class Intent {
         public static final String REF_FLAG_ACTIVITY_NEW_TASK = "FLAG_ACTIVITY_NEW_TASK";
         public static final String REF_FLAG_ACTIVITY_CLEAR_TOP = "FLAG_ACTIVITY_CLEAR_TOP";
     }
+
     public static final class ViewAttributes {
         public static final String MIN_HEIGHT = "minHeight";
     }
+
     /** The top level android package as a prefix, "android.". */
     public static final String ANDROID_SUPPORT_PKG_PREFIX =
             ANDROID_PKG_PREFIX + "support.";
     /** Architecture component package prefix */
     public static final String ANDROID_ARCH_PKG_PREFIX = ANDROID_PKG_PREFIX + "arch.";
+
     /** The android.view. package prefix */
     public static final String ANDROID_VIEW_PKG = ANDROID_PKG_PREFIX + "view.";
+
     /** The android.widget. package prefix */
     public static final String ANDROID_WIDGET_PREFIX = ANDROID_PKG_PREFIX + "widget.";
+
     /** The android.webkit. package prefix */
     public static final String ANDROID_WEBKIT_PKG = ANDROID_PKG_PREFIX + "webkit.";
+
     /** The android.preference. package prefix */
     public static final String ANDROID_PREFERENCE_PKG = ANDROID_PKG_PREFIX + "preference.";
+
     /** The android.app. package prefix */
     public static final String ANDROID_APP_PKG = ANDROID_PKG_PREFIX + "app.";
+
     /** The android.support.v4. package prefix */
     public static final String ANDROID_SUPPORT_V4_PKG =
             ANDROID_SUPPORT_PKG_PREFIX + "v4.";
+
     /** The android.support.v7. package prefix */
     public static final String ANDROID_SUPPORT_V7_PKG =
             ANDROID_SUPPORT_PKG_PREFIX + "v7.";
+
     /** The android.support.design. package prefix */
     public static final String ANDROID_SUPPORT_DESIGN_PKG =
             ANDROID_SUPPORT_PKG_PREFIX + "design.";
+
     /** The com.google.android.material. package prefix */
     public static final String ANDROID_MATERIAL_PKG = "com.google.android.material.";
+
     /** The android.support.constraint. package prefix */
     public static final String CONSTRAINT_LAYOUT_PKG = "android.support.constraint.";
+
     /** The androidx.constraintlayout. package prefix */
     public static final String ANDROIDX_CONSTRAINT_LAYOUT_PKG = "androidx.constraintlayout.";
+
     /** The androidx.recyclerview. package prefix */
     public static final String ANDROIDX_RECYCLER_VIEW_PKG = "androidx.recyclerview.";
+
     /** The androidx.cardview. package prefix */
     public static final String ANDROIDX_CARD_VIEW_PKG = "androidx.cardview.";
+
     /** The androidx.gridlayout. package prefix */
     public static final String ANDROIDX_GRID_LAYOUT_PKG = "androidx.gridlayout.";
+
     /** The androidx.leanback. package prefix */
     public static final String ANDROIDX_LEANBACK_PKG = "androidx.leanback.";
+
     /** The androidx.compose.material. package prefix */
     public static final String ANDROIDX_MATERIAL_PKG = "androidx.compose.material.";
+
     /** The androidx.wear.compose.material. package prefix */
     public static final String ANDROIDX_WEAR_MATERIAL_PKG = "androidx.wear.compose.material.";
+
     /** The androidx.coordinatorlayout. package prefix */
     public static final String ANDROIDX_COORDINATOR_LAYOUT_PKG = "androidx.coordinatorlayout.";
+
     /** The androidx.core. package prefix */
     public static final String ANDROIDX_CORE_PKG = "androidx.core.";
+
     /** The androidx.viewpager. package prefix */
     public static final String ANDROIDX_VIEWPAGER_PKG = "androidx.viewpager.";
+
     /** The androidx.appcompat. package prefix */
     public static final String ANDROIDX_APPCOMPAT_PKG = "androidx.appcompat.";
+
     /** The android.support.v17.leanback. package prefix */
     public static final String ANDROID_SUPPORT_LEANBACK_V17_PKG =
             ANDROID_SUPPORT_PKG_PREFIX + "v17.leanback.";
+
     /** The com.google.android.gms. package prefix */
     public static final String GOOGLE_PLAY_SERVICES_PKG = "com.google.android.gms.";
+
     /** The com.google.android.gms.ads. package prefix */
     public static final String GOOGLE_PLAY_SERVICES_ADS_PKG =
             GOOGLE_PLAY_SERVICES_PKG + "ads.";
+
     /** The com.google.android.gms.ads. package prefix */
     public static final String GOOGLE_PLAY_SERVICES_MAPS_PKG =
             GOOGLE_PLAY_SERVICES_PKG + "maps.";
+
     /** The LayoutParams inner-class name suffix, .LayoutParams */
     public static final String DOT_LAYOUT_PARAMS = ".LayoutParams";
+
     /** The fully qualified class name of an EditText view */
     public static final String FQCN_EDIT_TEXT = "android.widget.EditText";
+
     /** The fully qualified class name of a LinearLayout view */
     public static final String FQCN_LINEAR_LAYOUT = "android.widget.LinearLayout";
+
     /** The fully qualified class name of a RelativeLayout view */
     public static final String FQCN_RELATIVE_LAYOUT = "android.widget.RelativeLayout";
+
     /** The fully qualified class name of a GridLayout view */
     public static final String FQCN_GRID_LAYOUT = "android.widget.GridLayout";
+
     /** The fully qualified class name of a FrameLayout view */
     public static final String FQCN_FRAME_LAYOUT = "android.widget.FrameLayout";
+
     /** The fully qualified class name of a TableRow view */
     public static final String FQCN_TABLE_ROW = "android.widget.TableRow";
+
     /** The fully qualified class name of a TableLayout view */
     public static final String FQCN_TABLE_LAYOUT = "android.widget.TableLayout";
+
     /** The fully qualified class name of a GridView view */
     public static final String FQCN_GRID_VIEW = "android.widget.GridView";
+
     /** The fully qualified class name of a TabWidget view */
     public static final String FQCN_TAB_WIDGET = "android.widget.TabWidget";
+
     /** The fully qualified class name of a Button view */
     public static final String FQCN_BUTTON = "android.widget.Button";
+
     /** The fully qualified class name of a CheckBox view */
     public static final String FQCN_CHECK_BOX = "android.widget.CheckBox";
+
     /** The fully qualified class name of a CheckedTextView view */
     public static final String FQCN_CHECKED_TEXT_VIEW =
             "android.widget.CheckedTextView";
+
     /** The fully qualified class name of an ImageButton view */
     public static final String FQCN_IMAGE_BUTTON = "android.widget.ImageButton";
+
     /** The fully qualified class name of a RatingBar view */
     public static final String FQCN_RATING_BAR = "android.widget.RatingBar";
+
     /** The fully qualified class name of a SeekBar view */
     public static final String FQCN_SEEK_BAR = "android.widget.SeekBar";
+
     /** The fully qualified class name of a MultiAutoCompleteTextView view */
     public static final String FQCN_AUTO_COMPLETE_TEXT_VIEW =
             "android.widget.AutoCompleteTextView";
+
     /** The fully qualified class name of a MultiAutoCompleteTextView view */
     public static final String FQCN_MULTI_AUTO_COMPLETE_TEXT_VIEW =
             "android.widget.MultiAutoCompleteTextView";
+
     /** The fully qualified class name of a RadioButton view */
     public static final String FQCN_RADIO_BUTTON = "android.widget.RadioButton";
+
     /** The fully qualified class name of a ToggleButton view */
     public static final String FQCN_TOGGLE_BUTTON = "android.widget.ToggleButton";
+
     /** The fully qualified class name of a Spinner view */
     public static final String FQCN_SPINNER = "android.widget.Spinner";
+
     /** The fully qualified class name of an AdapterView */
     public static final String FQCN_ADAPTER_VIEW = "android.widget.AdapterView";
+
     /** The fully qualified class name of a ListView */
     public static final String FQCN_LIST_VIEW = "android.widget.ListView";
+
     /** The fully qualified class name of an ExpandableListView */
     public static final String FQCN_EXPANDABLE_LIST_VIEW =
             "android.widget.ExpandableListView";
+
     /** The fully qualified class name of a GestureOverlayView */
     public static final String FQCN_GESTURE_OVERLAY_VIEW =
             "android.gesture.GestureOverlayView";
+
     /** The fully qualified class name of a DatePicker */
     public static final String FQCN_DATE_PICKER = "android.widget.DatePicker";
+
     /** The fully qualified class name of a TimePicker */
     public static final String FQCN_TIME_PICKER = "android.widget.TimePicker";
+
     /** The fully qualified class name of a RadioGroup */
     public static final String FQCN_RADIO_GROUP = "android.widgets.RadioGroup";
+
     /** The fully qualified class name of a Space */
     public static final String FQCN_SPACE = "android.widget.Space";
+
     /** The fully qualified class name of a TextView view */
     public static final String FQCN_TEXT_VIEW = "android.widget.TextView";
+
     /** The fully qualified class name of InputType */
     public static final String FQCN_INPUT_TYPE = "android.text.InputType";
+
     /** The fully qualified class name of an ImageView view */
     public static final String FQCN_IMAGE_VIEW = "android.widget.ImageView";
+
     /** The fully qualified class name of NavHostFragment Fragment subclass */
     public static final String FQCN_NAV_HOST_FRAGMENT =
             "androidx.navigation.fragment.NavHostFragment";
+
     /** The fully qualified class name of a ScrollView */
     public static final String FQCN_SCROLL_VIEW = "android.widget.ScrollView";
+
     public static final String ATTR_SRC = "src";
     public static final String ATTR_SRC_COMPAT = "srcCompat";
+
     public static final String ATTR_GRAVITY = "gravity";
+
     public static final String ATTR_WEIGHT_SUM = "weightSum";
     public static final String ATTR_EMS = "ems";
+
     public static final String VALUE_HORIZONTAL = "horizontal";
+
     public static final String GRADLE_PLUGIN_NAME = "com.android.tools.build:gradle:";
-    /** The minimum version of Gradle that this version of Studio will support. */
-    public static final String GRADLE_MINIMUM_VERSION = "4.8.1";
+
     /**
      * The minimum version of Gradle that this version of the Gradle plugin will support. This also
      * happens to be a version of Gradle that is embedded and distributed along with the Android
      * Studio product. It need not actually be the latest version of Gradle, but it will most likely
      * be fairly recent.
      */
-    public static final String GRADLE_LATEST_VERSION = "8.7";
+    public static final String GRADLE_LATEST_VERSION = "9.5.0-milestone-5";
+
+    /**
+     * The minimum released version of the Android Gradle Plugin for which Studio will attempt a
+     * "forced upgrade" using the AGP Upgrade Assistant. Below this version, Studio will attempt to
+     * display a diagnostic informing the user that this project's version AGP is unsupported, but
+     * at some point that might fail.
+     */
+    public static final String GRADLE_PLUGIN_MINIMUM_FORCED_UPGRADE_VERSION = "4.2.0";
+
     /**
      * The minimum released version of the Android Gradle Plugin that this version of Studio will
      * support. (Support of the development series leading up to it is unknown.)
      */
-    public static final String GRADLE_PLUGIN_MINIMUM_VERSION = "3.2.0";
+    public static final String GRADLE_PLUGIN_MINIMUM_VERSION = "7.0.0";
+
     /**
      * The minimum released version of the Android Gradle Plugin that the next version of Studio
      * will support.
      */
-    public static final String GRADLE_PLUGIN_NEXT_MINIMUM_VERSION = "4.0.0";
+    public static final String GRADLE_PLUGIN_NEXT_MINIMUM_VERSION = "7.1.0";
+
     /**
      * A version of the Android Gradle Plugin that this version of Studio and associated tools (e.g.
      * lint) can safely recommend during its development cycle. If an up-to-date version is
      * required, consider using `LatestKnownPluginVersionProvider` instead.
      */
-    public static final String GRADLE_PLUGIN_RECOMMENDED_VERSION = "7.0.3";
+    // public static final String GRADLE_PLUGIN_RECOMMENDED_VERSION = Version.LAST_STABLE_ANDROID_GRADLE_PLUGIN_VERSION;
+
     /**
      * The version of NDK to use as default. If no specific version of NDK is specified in
      * build.gradle then this is the version that will be used.
      */
-    public static final String NDK_DEFAULT_VERSION = "26.1.10909125";
+    public static final String NDK_DEFAULT_VERSION = "28.2.13676358";
+
+    /**
+     * The minimum version of the Kotlin Gradle Plugin required for Kotlin Multiplatform projects.
+     */
+    public static final String MINIMUM_SUPPORTED_KOTLIN_MULTIPLATFORM_VERSION = "2.0.0";
+
     /** use api or implementation */
     @Deprecated public static final String GRADLE_COMPILE_CONFIGURATION = "compile";
     /** use api or implementation */
@@ -2552,8 +2980,9 @@ public final class SdkConstants {
     public static final String GRADLE_ANDROID_TEST_IMPLEMENTATION_CONFIGURATION =
             "androidTestImplementation";
     public static final String GRADLE_ANDROID_TEST_API_CONFIGURATION = "androidTestApi";
+
     public static final String GRADLE_ANDROID_TEST_UTIL_CONFIGURATION = "androidTestUtil";
-    public static final String CURRENT_BUILD_TOOLS_VERSION = "34.0.0";
+    public static final String CURRENT_BUILD_TOOLS_VERSION = "36.0.0";
     public static final String SUPPORT_LIB_GROUP_ID = "com.android.support";
     public static final String SUPPORT_LIB_ARTIFACT = "com.android.support:support-v4";
     public static final String DESIGN_LIB_ARTIFACT = "com.android.support:design";
@@ -2571,6 +3000,7 @@ public final class SdkConstants {
     public static final String ANNOTATIONS_LIB_ARTIFACT =
             SUPPORT_LIB_GROUP_ID + ":" + ANNOTATIONS_LIB_ARTIFACT_ID;
     public static final String MEDIA_ROUTER_LIB_ARTIFACT = "com.android.support:mediarouter-v7";
+
     public static final String ANDROIDX_MATERIAL_ARTIFACT = "com.google.android.material:material";
     public static final String ANDROIDX_CORE_UI_ARTIFACT = "androidx.core:core-ui";
     public static final String ANDROIDX_CARD_VIEW_ARTIFACT = "androidx.cardview:cardview";
@@ -2588,11 +3018,14 @@ public final class SdkConstants {
     public static final String ANDROIDX_COORDINATOR_LAYOUT_LIB_ARTIFACT =
             "androidx.coordinatorlayout:coordinatorlayout";
     public static final String ANDROIDX_CORE_SPLASHSCREEN = "androidx.core:core-splashscreen";
+
     public static final String TYPE_DEF_VALUE_ATTRIBUTE = "value";
     public static final String TYPE_DEF_FLAG_ATTRIBUTE = "flag";
     public static final String FN_ANNOTATIONS_ZIP = "annotations.zip";
+
     public static final String VIEW_BINDING_ARTIFACT = "com.android.databinding:viewbinding";
     public static final String ANDROIDX_VIEW_BINDING_ARTIFACT = "androidx.databinding:viewbinding";
+
     // Data Binding MISC
     public static final String DATA_BINDING_LIB_ARTIFACT = "com.android.databinding:library";
     // processor is always AndroidX
@@ -2614,9 +3047,12 @@ public final class SdkConstants {
             new String[] {TAG_VARIABLE, TAG_IMPORT, TAG_LAYOUT, TAG_DATA};
     public static final String[] ATTRS_DATA_BINDING =
             new String[] {ATTR_NAME, ATTR_TYPE, ATTR_CLASS, ATTR_ALIAS};
+
     public static final String CLASS_NAME_DATA_BINDING_COMPONENT = "DataBindingComponent";
+
     public static final String CLASS_FLOW = "kotlinx.coroutines.flow.Flow";
     public static final String CLASS_STATE_FLOW = "kotlinx.coroutines.flow.StateFlow";
+
     /** Name of keep attribute in XML */
     public static final String ATTR_KEEP = "keep";
     /** Name of discard attribute in XML (to mark resources as not referenced, despite guesses) */
@@ -2627,36 +3063,66 @@ public final class SdkConstants {
     public static final String VALUE_STRICT = "strict";
     /** {@linkplain #ATTR_SHRINK_MODE} value to keep possibly referenced resources */
     public static final String VALUE_SAFE = "safe";
+
     /** Prefix of the Android Support Repository path */
     public static final String ANDROID_SUPPORT_ARTIFACT_PREFIX = "com.android.";
     /** Prefix of the Google Repository path */
     public static final String GOOGLE_SUPPORT_ARTIFACT_PREFIX = "com.google.android.";
     /** Prefix of firebase groupIds */
     public static final String FIREBASE_ARTIFACT_PREFIX = "com.google.firebase.";
+
     @Deprecated
     public static String androidCmdName() {
         throw new UnsupportedOperationException(
-                "The \"android\" command is no longer included in the SDK. Any references to it (e.g. "
-                        + "by third-party plugins) should be removed.");
+                "The \"android\" command is no longer included in the SDK. Any references to it"
+                        + " (e.g. by third-party plugins) should be removed.");
     }
+
     public static final String META_INF = "meta-inf";
     public static final String PROGUARD_RULES_FOLDER_NAME = "proguard";
     /** Folder where proguard rules are located in jar, aar and project generated resources */
     public static final String PROGUARD_RULES_FOLDER = META_INF + "/" + PROGUARD_RULES_FOLDER_NAME;
+
     /** Folder where configuration files for R8 and other tools are located in jar files */
     public static final String COM_ANDROID_TOOLS_FOLDER = "com.android.tools";
+
     /** Folder where configuration files for R8 and other tools are located in jar files */
     public static final String TOOLS_CONFIGURATION_FOLDER =
             META_INF + "/" + COM_ANDROID_TOOLS_FOLDER;
+
     public static final String FD_PREFAB_PACKAGE = "prefab";
+
     /** Name used to identify a folder containing the exploded contents of an .aar file. */
     public static final String EXPLODED_AAR = "exploded-aar";
+
     /** Path separator in the url for the jar entry, e.g.: jar://my_jar.jar!/entry.txt */
     public static final String JAR_SEPARATOR = "!/";
+
     /** Url protocol of the jar files, e.g.: jar://my_jar.jar */
     public static final String JAR_PROTOCOL = "jar";
+
     /** Url protocol of a file. */
     public static final String FILE_PROTOCOL = "file";
+
     /** Sdk downloadable fonts folder. */
     public static final String SDK_DL_FONTS_FOLDER = "fonts";
+
+    /** Current version for ASM dependencies. */
+    public static final String CURRENT_ASM_VERSION = "9.9";
+
+    /** Logical ID of the primary display of an Android device. */
+    public static int PRIMARY_DISPLAY_ID = 0;
+
+    /**
+     * The name of the property used to declare which Watch Face Format is used.
+     *
+     * @see <a
+     *     href="https://developer.android.com/training/wearables/wff/setup#declare-wff-use">Watch
+     *     Face Format</a>
+     */
+    public static final String WATCH_FACE_FORMAT_VERSION_PROPERTY =
+            "com.google.wear.watchface.format.version";
+
+    /** The default Watch Face Format to use if the user hasn't specified it yet. */
+    public static final String WATCH_FACE_FORMAT_DEFAULT_VERSION = "1";
 }

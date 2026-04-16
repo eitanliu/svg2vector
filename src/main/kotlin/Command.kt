@@ -27,13 +27,13 @@ object Command {
     @JvmStatic
     fun parse(args: Array<String>) {
         val opt = Options().apply {
-            addOption("d", "dir", true, "the target svg directory")
-            addOption("f", "file", true, "the target svg file")
-            addOption("o", "output", true, "the output vector file or directory")
-            addOption("w", "width", true, "the width needs to be overridden.")
-            addOption("h", "height", true, "the height needs to be overridden. ")
-            addOption("a", "alpha", true, "the alpha needs to be overridden. (0.0 ~ 1.0)")
-            addOption("t", "tint", true, "the RGB value of the tint. (000000 ~ ffffff)")
+            addOption("d", "dir", true, "source svg directory")
+            addOption("f", "file", true, "source svg file")
+            addOption("o", "output", true, "output vector file or directory")
+            addOption("w", "width", true, "width needs to be overridden")
+            addOption("h", "height", true, "height needs to be overridden")
+            addOption("a", "alpha", true, "alpha needs to be overridden. (0.0 ~ 1.0)")
+            addOption("t", "tint", true, "ARGB value of the tint. (00000000 ~ ffffffff)")
             addOption("m", "autoMirrored", true, "auto mirroring for RTL layout (default ture)")
         }
 

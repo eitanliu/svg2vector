@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 package com.android.ide.common.util;
+
 import com.android.annotations.NonNull;
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -31,12 +32,14 @@ import java.awt.image.Raster;
 import java.awt.image.RescaleOp;
 import java.util.ArrayList;
 import java.util.List;
+
 /**
  * A set of utility classes for manipulating {@link BufferedImage} objects and drawing them to
  * {@link Graphics2D} canvases.
  */
 public class AssetUtil {
     public static final Effect[] NO_EFFECTS = {};
+
     /**
      * Creates a new ARGB {@link BufferedImage} of the given width and height.
      *
@@ -47,6 +50,7 @@ public class AssetUtil {
     public static BufferedImage newArgbBufferedImage(int width, int height) {
         return new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
     }
+
     /**
      * Smoothly scales the given {@link BufferedImage} to the given width and height using the
      * {@link Image#SCALE_SMOOTH} algorithm (generally bicubic resampling or bilinear filtering).
@@ -62,6 +66,7 @@ public class AssetUtil {
         if (source.getWidth() == width && source.getHeight() == height) {
             return source;
         }
+
         Image scaledImage = source.getScaledInstance(width, height, Image.SCALE_SMOOTH);
         BufferedImage scaledBufImage =
                 new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -70,6 +75,7 @@ public class AssetUtil {
         g.dispose();
         return scaledBufImage;
     }
+
     /**
      * Applies a gaussian blur of the given radius to the given {@link BufferedImage} using a kernel
      * convolution.
@@ -82,16 +88,20 @@ public class AssetUtil {
         if (radius == 0) {
             return source;
         }
+
         int r = (int) Math.ceil(radius);
         int rows = r * 2 + 1;
         float[] kernelData = new float[rows * rows];
+
         double sigma = radius / 3;
         double sigma22 = 2 * sigma * sigma;
         double sqrtPiSigma22 = Math.sqrt(Math.PI * sigma22);
         double radius2 = radius * radius;
+
         double total = 0;
         int index = 0;
         double distance2;
+
         int x, y;
         for (y = -r; y <= r; y++) {
             for (x = -r; x <= r; x++) {
@@ -105,15 +115,18 @@ public class AssetUtil {
                 ++index;
             }
         }
+
         for (index = 0; index < kernelData.length; index++) {
             kernelData[index] /= total;
         }
+
         // We first pad the image so the kernel can operate at the edges.
         BufferedImage paddedSource = paddedImage(source, r);
         BufferedImage blurredPaddedImage = operatedImage(paddedSource, new ConvolveOp(
                 new Kernel(rows, rows, kernelData), ConvolveOp.EDGE_ZERO_FILL, null));
         return blurredPaddedImage.getSubimage(r, r, source.getWidth(), source.getHeight());
     }
+
     /**
      * Inverts the alpha channel of the given {@link BufferedImage}. RGB data for the inverted area
      * are undefined, so it's generally best to fill the resulting image with a color.
@@ -124,8 +137,10 @@ public class AssetUtil {
     public static BufferedImage invertedAlphaImage(BufferedImage source) {
         float[] scaleFactors = new float[] {1, 1, 1, -1};
         float[] offsets = new float[] {0, 0, 0, 255};
+
         return operatedImage(source, new RescaleOp(scaleFactors, offsets, null));
     }
+
     /**
      * Applies a {@link BufferedImageOp} on the given {@link BufferedImage}.
      *
@@ -139,6 +154,7 @@ public class AssetUtil {
         g.drawImage(source, op, 0, 0);
         return newImage;
     }
+
     /**
      * Fills the given {@link BufferedImage} with a {@link Paint}, preserving its alpha channel.
      *
@@ -155,6 +171,7 @@ public class AssetUtil {
         g.fillRect(0, 0, source.getWidth(), source.getHeight());
         return newImage;
     }
+
     /**
      * Pads the given {@link BufferedImage} on all sides by the given padding amount.
      *
@@ -166,12 +183,14 @@ public class AssetUtil {
         if (padding == 0) {
             return source;
         }
+
         BufferedImage newImage = newArgbBufferedImage(
                 source.getWidth() + padding * 2, source.getHeight() + padding * 2);
         Graphics2D g = (Graphics2D) newImage.getGraphics();
         g.drawImage(source, padding, padding, null);
         return newImage;
     }
+
     /**
      * Trims the transparent pixels from the given {@link BufferedImage} (returns a sub-image).
      *
@@ -185,6 +204,7 @@ public class AssetUtil {
         int srcHeight = source.getHeight();
         Raster raster = source.getRaster();
         int l = srcWidth, t = srcHeight, r = 0, b = 0;
+
         int alpha, x, y;
         int[] pixel = new int[4];
         for (y = 0; y < srcHeight; y++) {
@@ -199,12 +219,15 @@ public class AssetUtil {
                 }
             }
         }
+
         if (l > r || t > b) {
             // No pixels, couldn't trim
             return source;
         }
+
         return source.getSubimage(l, t, r - l + 1, b - t + 1);
     }
+
     /**
      * Draws the given {@link BufferedImage} to the canvas, at the given coordinates, with the given
      * {@link Effect}s applied. Note that drawn effects may be outside the bounds of the source
@@ -217,9 +240,10 @@ public class AssetUtil {
      * @param effects The list of effects to apply.
      */
     public static void drawEffects(Graphics2D g, BufferedImage source, int x, int y,
-                                   Effect[] effects) {
+            Effect[] effects) {
         List<ShadowEffect> shadowEffects = new ArrayList<>();
         List<FillEffect> fillEffects = new ArrayList<>();
+
         for (Effect effect : effects) {
             if (effect instanceof ShadowEffect) {
                 shadowEffects.add((ShadowEffect) effect);
@@ -227,11 +251,13 @@ public class AssetUtil {
                 fillEffects.add((FillEffect) effect);
             }
         }
+
         Composite oldComposite = g.getComposite();
         for (ShadowEffect effect : shadowEffects) {
             if (effect.inner) {
                 continue;
             }
+
             // Outer shadow
             g.setComposite(AlphaComposite.getInstance(
                     AlphaComposite.SRC_OVER, (float) effect.opacity));
@@ -242,25 +268,30 @@ public class AssetUtil {
                     (int) effect.xOffset, (int) effect.yOffset, null);
         }
         g.setComposite(oldComposite);
+
         // Inner shadow & fill effects.
         Rectangle imageRect = new Rectangle(0, 0, source.getWidth(), source.getHeight());
         BufferedImage out = newArgbBufferedImage(imageRect.width, imageRect.height);
         Graphics2D g2 = (Graphics2D) out.getGraphics();
         double fillOpacity = 1.0;
+
         g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
         g2.drawImage(source, 0, 0, null);
         g2.setComposite(AlphaComposite.SrcAtop);
+
         // Gradient fill
         for (FillEffect effect : fillEffects) {
             g2.setPaint(effect.paint);
             g2.fillRect(0, 0, imageRect.width, imageRect.height);
             fillOpacity = Math.max(0, Math.min(1, effect.opacity));
         }
+
         // Inner shadows
         for (ShadowEffect effect : shadowEffects) {
             if (!effect.inner) {
                 continue;
             }
+
             BufferedImage innerShadowImage = newArgbBufferedImage(
                     imageRect.width, imageRect.height);
             Graphics2D g3 = (Graphics2D) innerShadowImage.getGraphics();
@@ -273,10 +304,12 @@ public class AssetUtil {
                             effect.color),
                     0, 0, null);
         }
+
         g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) fillOpacity));
         g.drawImage(out, x, y, null);
         g.setComposite(oldComposite);
     }
+
     /**
      * Draws the given {@link BufferedImage} to the canvas, centered, wholly contained within the
      * bounds defined by the destination rectangle, and with preserved aspect ratio.
@@ -321,6 +354,7 @@ public class AssetUtil {
                     null);
         }
     }
+
     /**
      * Draws the given {@link BufferedImage} to the canvas, centered and cropped to fill the bounds
      * defined by the destination rectangle, and with preserved aspect ratio.
@@ -365,6 +399,7 @@ public class AssetUtil {
                     null);
         }
     }
+
     /**
      * Draws the given {@link BufferedImage} <code>source</code>, centered and with preserved aspect
      * ratio, to the given destination rectangle <code>destRect</code> inside the canvas <code>g
@@ -417,6 +452,7 @@ public class AssetUtil {
                     null);
         }
     }
+
     /**
      * Draws the given {@link BufferedImage} to the canvas, centered, wholly contained within the
      * bounds defined by the destination rectangle, and with preserved aspect ratio.
@@ -431,8 +467,10 @@ public class AssetUtil {
         int h = source.getHeight();
         g.drawImage(source, (imageRect.width - w) / 2, (imageRect.height - h) / 2, w, h, null);
     }
+
     /** An effect to apply in {@link #drawEffects}. */
     public abstract static class Effect {}
+
     /** An inner or outer shadow. */
     public static class ShadowEffect extends Effect {
         public double xOffset;
@@ -441,8 +479,9 @@ public class AssetUtil {
         public Color color;
         public double opacity;
         public boolean inner;
+
         public ShadowEffect(double xOffset, double yOffset, double radius, Color color,
-                            double opacity, boolean inner) {
+                double opacity, boolean inner) {
             this.xOffset = xOffset;
             this.yOffset = yOffset;
             this.radius = radius;
@@ -451,16 +490,19 @@ public class AssetUtil {
             this.inner = inner;
         }
     }
+
     /**
      * A fill, defined by a paint.
      */
     public static class FillEffect extends Effect {
         public Paint paint;
         public double opacity;
+
         public FillEffect(Paint paint, double opacity) {
             this.paint = paint;
             this.opacity = opacity;
         }
+
         public FillEffect(Paint paint) {
             this.paint = paint;
             this.opacity = 1.0;

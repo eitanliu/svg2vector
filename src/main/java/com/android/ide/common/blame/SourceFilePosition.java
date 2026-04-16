@@ -17,14 +17,16 @@
 package com.android.ide.common.blame;
 
 import com.android.annotations.NonNull;
+import com.android.annotations.concurrency.Immutable;
 import com.google.common.base.Objects;
 import java.io.File;
 import java.io.Serializable;
 
 
+@Immutable
 public final class SourceFilePosition implements Serializable {
 
-    public static final SourceFilePosition UNKNOWN =
+    public static final com.android.ide.common.blame.SourceFilePosition UNKNOWN =
             new SourceFilePosition(SourceFile.UNKNOWN, SourcePosition.UNKNOWN);
 
     @NonNull

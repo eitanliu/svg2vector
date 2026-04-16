@@ -45,29 +45,39 @@ svg2vector.bat -d .\input_dir -o .\output_dir
 
 ## Sources
 
-[tools/base](https://android.googlesource.com/platform/tools/base/), [Branches](https://android.googlesource.com/platform/tools/base/+refs)
+[tools/base](https://android.googlesource.com/platform/tools/base/), [Branches/Tags](https://android.googlesource.com/platform/tools/base/+refs)
 
-### studio-2024.2.1-patch02
-```text
-https://android.googlesource.com/platform/tools/base/+archive/refs/tags/studio-2024.2.1-patch02/sdk-common/src/main/java/com/android/ide/common/vectordrawable.tar.gz
-https://android.googlesource.com/platform/tools/base/+archive/refs/tags/studio-2024.2.1-patch02/sdk-common/src/main/java/com/android/ide/common/blame.tar.gz
-https://android.googlesource.com/platform/tools/base/+archive/refs/tags/studio-2024.2.1-patch02/common/src/main/java/com/android/utils.tar.gz
-https://android.googlesource.com/platform/tools/base/+/refs/tags/studio-2024.2.1-patch02/sdk-common/src/main/java/com/android/ide/common/util/AssetUtil.java
+### Find the latest tag
+
+```shell
+curl -s "https://android.googlesource.com/platform/tools/base/+refs" \
+  | grep -o 'studio-[0-9.]*\(-patch[0-9]*\)\?' | sort -u | tail -10
 ```
-### studio-2024.1.2-canary1
+
+### Download by tag
+
+Replace `{tag}` with the target tag (e.g. `studio-2025.3.3`):
+
 ```text
-https://android.googlesource.com/platform/tools/base/+/refs/tags/studio-2024.1.2-canary1/sdk-common/src/main/java/com/android/ide/common/vectordrawable
-https://android.googlesource.com/platform/tools/base/+/refs/tags/studio-2024.1.2-canary1/sdk-common/src/main/java/com/android/ide/common/util/
-https://android.googlesource.com/platform/tools/base/+/refs/tags/studio-2024.1.2-canary1/common/src/main/java/com/android/ide/common/blame/
-https://android.googlesource.com/platform/tools/base/+/refs/tags/studio-2024.1.2-canary1/common/src/main/java/com/android/utils
+https://android.googlesource.com/platform/tools/base/+archive/refs/tags/{tag}/sdk-common/src/main/java/com/android/ide/common/vectordrawable.tar.gz
+https://android.googlesource.com/platform/tools/base/+archive/refs/tags/{tag}/common/src/main/java/com/android/ide/common/blame.tar.gz
+https://android.googlesource.com/platform/tools/base/+archive/refs/tags/{tag}/common/src/main/java/com/android/utils.tar.gz
+https://android.googlesource.com/platform/tools/base/+/refs/tags/{tag}/sdk-common/src/main/java/com/android/ide/common/util/AssetUtil.java
+https://android.googlesource.com/platform/tools/base/+/refs/tags/{tag}/common/src/main/java/com/android/SdkConstants.java
 ```
-### main
+
+### Download from main branch
+
 ```text
-https://android.googlesource.com/platform/tools/base/+/refs/heads/main/sdk-common/src/main/java/com/android/ide/common/vectordrawable
-https://android.googlesource.com/platform/tools/base/+/refs/heads/main/sdk-common/src/main/java/com/android/ide/common/util/
-https://android.googlesource.com/platform/tools/base/+/refs/heads/main/common/src/main/java/com/android/ide/common/blame/
-https://android.googlesource.com/platform/tools/base/+/refs/heads/main/common/src/main/java/com/android/utils
+https://android.googlesource.com/platform/tools/base/+archive/refs/heads/main/sdk-common/src/main/java/com/android/ide/common/vectordrawable.tar.gz
+https://android.googlesource.com/platform/tools/base/+archive/refs/heads/main/common/src/main/java/com/android/ide/common/blame.tar.gz
+https://android.googlesource.com/platform/tools/base/+archive/refs/heads/main/common/src/main/java/com/android/utils.tar.gz
+https://android.googlesource.com/platform/tools/base/+/refs/heads/main/sdk-common/src/main/java/com/android/ide/common/util/AssetUtil.java
 https://android.googlesource.com/platform/tools/base/+/refs/heads/main/common/src/main/java/com/android/SdkConstants.java
 ```
+
+> Notes:
+> - `SdkConstants.java`: comment out `import com.android.sdklib.AndroidVersion` and fields that depend on `AndroidVersion`/`Version`.
+> - `SvgTree.java`: keep local `autoMirrored` customization, do not overwrite.
 
 [Guava](https://android.googlesource.com/platform/external/guava/)

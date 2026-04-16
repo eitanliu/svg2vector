@@ -18,6 +18,7 @@ package com.android.ide.common.blame;
 
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
+import com.android.annotations.concurrency.Immutable;
 import com.google.common.base.Objects;
 import java.io.File;
 import java.io.Serializable;
@@ -29,6 +30,7 @@ import java.nio.file.Paths;
  * a/../a/b), it is better to use absolute files, otherwise the equals/hash method of this class may
  * fail.
  */
+@Immutable
 public final class SourceFile implements Serializable {
 
     @NonNull

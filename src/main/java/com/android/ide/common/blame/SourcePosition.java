@@ -17,6 +17,7 @@
 package com.android.ide.common.blame;
 
 import com.android.annotations.NonNull;
+import com.android.annotations.concurrency.Immutable;
 import com.google.common.base.Objects;
 import java.io.Serializable;
 
@@ -25,6 +26,7 @@ import java.io.Serializable;
  *
  * <p>Positions that are unknown are represented by -1.
  */
+@Immutable
 public final class SourcePosition implements Serializable {
 
     @NonNull
