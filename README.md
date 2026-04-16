@@ -51,7 +51,7 @@ svg2vector.bat -d .\input_dir -o .\output_dir
 
 ```shell
 curl -s "https://android.googlesource.com/platform/tools/base/+refs" \
-  | grep -o 'studio-[0-9.]*\(-patch[0-9]*\)\?' | sort -u | tail -10
+  | grep -oE 'studio-[0-9]{4}\.[0-9.]*(-patch[0-9]*)?' | sort -u | tail -10
 ```
 
 ### Download by tag
