@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.eitanliu"
-version = "1.0.2"
+version = "1.0.3"
 
 apply(from = rootProject.file("gradle/application_manifest.gradle.kts"))
 apply(from = rootProject.file("gradle/jar_manifest.gradle.kts"))

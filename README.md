@@ -6,7 +6,7 @@ Add `svg2vertor/bin` to Path.
 
 JVM
 ```shell
-java -jar svg2vector-1.0.2.jar -d ./
+java -jar svg2vector-1.0.3.jar -d ./
 ```
 
 Linux/Mac
